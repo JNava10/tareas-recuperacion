@@ -2,7 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Role;
+use App\Models\Task;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -33,6 +37,22 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (User $user) {
+            print_r( $this->faker->randomElement(Role::all()->pluck('id')));
+            DB::table('assigned_roles')->insert([
+                'user_id' => $user->id,
+                'role_id' => $this->faker->randomElement(Role::all()->pluck('id'))
+            ]);
+
+            DB::table('assigned_tasks')->insert([
+                'user_id' => $user->id,
+                'task_id' => $this->faker->randomElement(Task::all()->pluck('id'))
+            ]);
+        });
     }
 
     /**
