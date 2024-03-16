@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
-            $table->integer('scheduled_hours');
-            $table->integer('realized_hours');
+            $table->integer('scheduled_hours')->default(0);
+            $table->integer('realized_hours')->default(0);
             $table->unsignedBigInteger('diff_id');
             $table->timestamps();
             $table->timestamp('completed_at')->nullable();
