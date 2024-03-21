@@ -1,4 +1,4 @@
-import {Fetch} from "../api/fetch.js";
+import {Fetch} from "./fetch.js";
 
 export const login = async (email, password) => {
     const body = {email, password}

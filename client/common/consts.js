@@ -23,3 +23,14 @@ export const passwordRegex = /[\w!"·$%&\/(\\)=?*¿+\-`<>.:,;|@#~½¬{\[\]}ªº]
 export const userNameRegex = /[A-Za-z]{3,12}/;
 export const userFirstSurnameRegex = userNameRegex;
 export const userSecondSurnameRegex = userNameRegex;
+
+// BULMA //
+
+export const colors = {
+    primary: 'is-primary',
+    link: 'is-link',
+    info: 'is-info',
+    success: 'is-success',
+    warning: 'is-warning',
+    danger: 'is-danger',
+}
