@@ -11,7 +11,7 @@ const config = {
     },
     devServer: {
         static: {
-            directory: path.join(__dirname, 'view'),
+            directory: __dirname,
         },
         compress: true,
         port: 9000,
