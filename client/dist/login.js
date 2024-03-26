@@ -1,0 +1,1 @@
+(()=>{"use strict";const e=/[A-Za-z0-9]{4,25}@[A-Za-z]{3,10}.[A-Za-z]{2,7}$/,t=/[\w!"·$%&\/(\\)=?*¿+\-`<>.:,;|@#~½¬{\[\]}ªº]{3,20}/,o=document.querySelector('input[type="email"]'),n=document.querySelector('input[type="password"]');document.querySelector(".login-btn").addEventListener("login",(()=>{const l=e.test(o.value),u=t.test(n.value);l&&u||console.log("invalido.")}))})();
