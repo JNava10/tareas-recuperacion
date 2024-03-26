@@ -37,8 +37,7 @@ class AuthController extends Controller
             "Credenciales incorrectas. Revisa las credenciales introducidas de nuevo.",
             [
                 "logged" => false,
-            ],
-            SymphonyResponse::HTTP_UNAUTHORIZED
+            ]
         );
 
         $abilities = $this->getUserAbilities($request->email);

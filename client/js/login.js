@@ -2,7 +2,8 @@ import {colors, emailRegex, passwordRegex} from "../common/consts.js";
 import * as authService from "../common/api/auth.api.js";
 import * as msgService from "../common/services/message.service.js";
 import * as storageService from "../common/services/storage.service.js";
-import {redirectTo} from "../common/services/common.service";
+import {redirectTo} from "../common/services/common.service.js";
+import {showAlert} from "../common/services/message.service.js";
 
 const emailInput = document.querySelector('input[type="email"]');
 const passwordInput = document.querySelector('input[type="password"]');
@@ -14,10 +15,12 @@ const handleLogin = async (event) => {
     const emailValid = emailRegex.test(emailInput.value);
     const passwordValid = passwordRegex.test(passwordInput.value);
 
-    if (!emailValid || !passwordValid) {
-        console.log(`Email: ${emailValid}, pass: ${passwordValid}`);
-        // TODO: Invalid alert.
-        return;
+    if (!emailValid)  {
+        showAlert('El email introducido no es valido', colors.danger)
+        return
+    } else if (!passwordValid) {
+        showAlert('La contraseña introducida no es valida', colors.danger)
+        return
     }
 
     const emailValue = emailInput.value;
@@ -28,13 +31,17 @@ const handleLogin = async (event) => {
         msgService.showAlert('Credenciales invalidas, intentalo de nuevo.',  colors.danger)
     }
 
+    console.log(data)
+
     if (data.token) {
         msgService.setInputSuccess(emailInput)
         msgService.setInputSuccess(passwordInput)
 
         storageService.addCookie('token', data.token);
+        document.cookie = ""
+        storageService.deleteCookie('token');
 
-        redirectTo('public/main')
+        redirectTo('main')
     }
 };
 

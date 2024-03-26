@@ -16,12 +16,12 @@ export const addCookie = (key, value) => {
     ) !== null
 
     if (!cookieExists) {
-        document.cookie += `${key}=${value};`
+        document.cookie = `${key}=${value}; `
         return;
     }
 
     deleteCookie(key)
-    document.cookie += `${key}=${value};`
+    document.cookie = `${key}=${value}; `
 }
 
 export const getCookie = (key) => {

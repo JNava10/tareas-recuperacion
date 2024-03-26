@@ -1,3 +1,4 @@
+import {colors} from "../consts.js";
 
 const alertClass = 'notification';
 
@@ -6,17 +7,10 @@ export const setInputSuccess = (input, message = '') => {
     const label = document.querySelector(`label[for=${input.id}]`);
 
     if (label) {
-        label.className += 'has-text-success';
+        label.classList.add('has-text-success');
     }
 
-    input.className += 'is-success'
-
-    if (message.length > 0) {
-        const foot = document.createElement('p');
-        foot.innerHTML = `<p class="mt-2 text-sm text-red-600 dark:text-red-500">${message}</p>`;
-
-        input.after(foot);
-    }
+    input.classList.add('has-text-success');
 }
 
 /**
@@ -24,7 +18,7 @@ export const setInputSuccess = (input, message = '') => {
  * @param text {string}
  * @param style {string}
  */
-export const showAlert = (text, style) => {
+export const showAlert = (text, style = colors.success) => {
     const alertLifeSecs = 3; // Segundos que durará en pantalla el alert.
     let alertExists = document.querySelector(`.${alertClass}`) !== null;
 
