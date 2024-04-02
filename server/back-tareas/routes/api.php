@@ -11,4 +11,7 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('/auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('gen_recover_code', [AuthController::class, 'generateRecoverCode']);
+    Route::post('check_recover_code', [AuthController::class, 'checkRecoverCode']);
+    Route::post('change_password', [AuthController::class, 'changePassword']);
 });

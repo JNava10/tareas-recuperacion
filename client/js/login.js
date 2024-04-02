@@ -31,8 +31,6 @@ const handleLogin = async (event) => {
         msgService.showAlert('Credenciales invalidas, intentalo de nuevo.',  colors.danger)
     }
 
-    console.log(data)
-
     if (data.token) {
         msgService.setInputSuccess(emailInput)
         msgService.setInputSuccess(passwordInput)
