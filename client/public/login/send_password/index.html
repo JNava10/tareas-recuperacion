@@ -19,13 +19,24 @@
                     <h1 class="title is-2">Recuperación de contraseña</h1>
                     <form class="box">
                         <div class="field">
-                            <label class="label">Codigo de recuperación</label>
+                            <label class="label">Contraseña nueva</label>
                             <div class="control">
-                                <input class="input" type="email" id="email" placeholder="Introduce el codigo (6 digitos).">
+                                <input class="input" type="password" id="password" placeholder="Introduce el codigo (6 digitos).">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Confirmar contraseña nueva</label>
+                            <div class="control">
+                                <input class="input" type="password" id="confirmPassword" placeholder="Introduce el codigo (6 digitos).">
                             </div>
                         </div>
 
-                        <button type="submit" class="button is-primary" data-target="code-modal" id="send-btn">Enviar codigo</button>
+                        <div>
+                            <label for="showPasswords">Mostrar contraseñas </label>
+                            <input type="checkbox" id="showPasswords">
+                        </div>
+
+                        <button type="submit" class="button is-primary" id="send-password-btn">Enviar contraseña</button>
                     </form>
                 </div>
             </div>
@@ -35,6 +46,6 @@
 <footer></footer>
 
 
-<script type="module" src="../../../js/send_code.js"></script>
+<script type="module" src="../../../js/send_password.js"></script>
 </body>
 </html>

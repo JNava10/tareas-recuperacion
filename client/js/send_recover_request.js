@@ -63,8 +63,11 @@ const handeCodeSubmit = async (event) => {
 
     if (success) {
         msgService.showAlert(data.message,  colors.success);
-        storageService.add('recover_key', data.key);
-        redirectTo('login/send_password')
+
+        storageService.add('recover_key', emailValue);
+        storageService.add('recover_email', data.key);
+
+        redirectTo('login/send_password');
     }
 }
 

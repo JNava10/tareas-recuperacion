@@ -1,5 +1,11 @@
 import {Fetch} from "./fetch.js";
 
+export const sendPassword = async (passwordValue, key, email) => {
+    const body = {password: passwordValue, key: key, email: email}
+    console.log(body)
+    return await Fetch.post('auth/change_password', body, false);
+};
+
 export const sendRecoverCode = async (email, code) => {
     const body = {email, code}
     return await Fetch.post('auth/check_recover_code', body, false);
