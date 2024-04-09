@@ -16,12 +16,12 @@ const handlePasswordSubmit = async (event) => {
     event.preventDefault();
 
     const passwordValue = passwordInput.value;
-    const confirmPasswordValue = passwordInput.value;
+    const confirmPasswordValue = confirmPasswordInput.value;
 
     const passwordValid = regex.password.test(passwordValue);
     const confirmPasswordValid = regex.password.test(confirmPasswordValue);
 
-    if (!passwordValid || confirmPasswordValid)  {
+    if (!passwordValid || !confirmPasswordValid)  {
         showAlert('La contraseñas introducidas no son validas', colors.danger);
         return;
     }
@@ -30,7 +30,6 @@ const handlePasswordSubmit = async (event) => {
         showAlert('La contraseñas introducidas no coinciden.', colors.danger);
         return;
     }
-
 
     const key = storageService.get('recover_key');
     const email = storageService.get('recover_email');
@@ -45,7 +44,6 @@ const handlePasswordSubmit = async (event) => {
 
     if (success) {
         msgService.showAlert(data.message,  colors.success);
-        console.log(data)
     }
 };
 

@@ -3,7 +3,11 @@ export const add = (key, value) => {
 }
 
 export const get = (key)  => {
-    return JSON.parse(localStorage.getItem(key))
+    return localStorage.getItem(key);
+}
+
+export const getObject = (key)  => {
+    return JSON.parse(localStorage.getItem(key));
 }
 
 export const remove = (key)  => {
