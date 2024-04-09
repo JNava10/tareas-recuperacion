@@ -124,7 +124,7 @@ class AuthController extends Controller
             $request->all(),
             [
                 'email' => 'required|email|max:255',
-                'code' => 'required|integer|max_digits:6'
+                'code' => 'required|string|max:6'
             ]
         );
 

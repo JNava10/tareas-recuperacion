@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html class="theme-dark" data-theme="dark" lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Nombre de la seccion</title>
+    <title>Recuperación de contraseña</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="../../styles/style.css">
     <link rel="stylesheet" href="../../styles/login.css">
@@ -12,10 +12,12 @@
 <header></header>
 <main>
     <section class="section">
+
         <div class="container">
             <div class="columns is-centered is-vcentered">
                 <div class="column is-half">
-                    <form class="box">
+                    <h1 class="title is-2">Recuperación de contraseña</h1>
+                    <form id="email-form" class="box">
                         <div class="field">
                             <label class="label">Email</label>
                             <div class="control">
@@ -23,24 +25,30 @@
                             </div>
                         </div>
 
+                        <p><sup>*Se enviará un codigo de recuperación a la dirección introducida.</sup></p>
+
+                        <button type="submit" class="button is-primary" data-target="code-modal" id="send-email-btn">Enviar correo</button>
+                    </form>
+
+                    <form id="code-form" class="box">
                         <div class="field">
-                            <label class="label">Contraseña</label>
+                            <label class="label">Codigo de recuperación</label>
                             <div class="control">
-                                <input class="input" type="password" id="password" placeholder="Introduce una contraseña.">
+                                <input class="input" disabled type="number" id="code-input" placeholder="Introduce el codigo (6 digitos).">
                             </div>
                         </div>
 
-                        <button type="submit" class="button is-primary" id="login-btn">Iniciar sesión</button>
+                        <button type="submit" disabled class="button is-primary" data-target="code-modal" id="send-code-btn">Enviar codigo</button>
                     </form>
-                    <hr>
-                    <span>¿No recuerdas tu contraseña? <a href="">Puedes cambiarla aqui</a></span>
+                </div>
                 </div>
             </div>
         </div>
     </section>
 </main>
 <footer></footer>
-<!--<script src="../../dist/login.js"></script>-->
-<script type="module" src="../../js/login.js"></script>
+
+
+<script type="module" src="../../../js/send_recover_request.js"></script>
 </body>
 </html>
