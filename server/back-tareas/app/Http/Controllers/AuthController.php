@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
@@ -60,6 +61,20 @@ class AuthController extends Controller
         );
     }
 
+    /*
+     * Explicación sobre el algoritmo de recuperación de contraseña:
+     *
+     * Se ha implementado un sistema seguro en donde el usuario puede cambiar su contraseña a traves de codigos de un unico uso.
+     * Es decir, cada vez que el usuario quiere recuperar su contraseña, debe introducir un codigo unico para poder cambiar su contraseña.
+     *
+     * 1. El usuario pide recuperar su contraseña. El servidor crea un nuevo codigo de un solo uso asociado al usuario y se le envia por email.
+     *
+     * 2. El usuario introduce el codigo que se le ha enviado por email, y el sistema comprueba si es correcto. Si es asi, el usuario recibirá una clave unica
+     * asociada a su email, que servirá como identifiación a la hora de cambiar la contraseña.
+     *
+     * 3. El usuario manda la contraseña nueva, con la clave que ha recibido. Si todo es correcto, se cambiará la contraseña.
+     * */
+
     public function generateRecoverCode(Request $request) {
         $validate = Validator::make(
             $request->all(),
@@ -80,10 +95,12 @@ class AuthController extends Controller
             $user = User::where('email', $email)->first();
 
             if ($user) {
-                $this->generatePasswordCode($user);
+                $code = $this->generatePasswordCode($user);
+
+                $this->sendRecoverEmail($code, $email, $user);
 
                 return Common::sendStdResponse(
-                    "Codigo de recuperación generado y enviado a '$email'",
+                    "Codigo de recuperación generado y enviado a $email",
                     ['executed' => true]
                 );
             } else return Common::sendStdResponse(
@@ -127,7 +144,7 @@ class AuthController extends Controller
             );
 
             $lastUserCode = RecoverCode::where('user', $user->id)
-                ->orderBy('expires_at', 'asc')
+                ->orderBy('expires_at', 'desc')
                 ->first();
 
             if (!$lastUserCode) return Common::sendStdResponse(
@@ -135,15 +152,18 @@ class AuthController extends Controller
                 ['executed' => false]
             );
 
-            if ($lastUserCode->used) return Common::sendStdResponse(
+            if ($lastUserCode->used === false) return Common::sendStdResponse(
                 "El codigo introducido ya ha sido usado.",
                 ['executed' => false]
             );
 
-            $codeExpireDate = Carbon::make($lastUserCode->expires_at);
+            $codeExpireDate = $lastUserCode->expires_at;
+
+            echo $lastUserCode->code;
+            echo $request->code;
 
             // Comprobamos si el codigo ha expirado comprobando si su fecha de expiracion es superior a la fecha actual.
-            if (!$codeExpireDate->gt(now())) return Common::sendStdResponse(
+            if (now()->gt($codeExpireDate)) return Common::sendStdResponse(
                 "El codigo introducido está expirado.",
                 ['executed' => false]
             );
@@ -211,6 +231,13 @@ class AuthController extends Controller
                 ['executed' => false]
             );
 
+            $codeExpireDate = Carbon::make($lastUserCode->expires_at);
+
+            if (now()->gt($codeExpireDate)) return Common::sendStdResponse(
+                "La clave está expirada.",
+                ['executed' => false]
+            );
+
             $user->password = Hash::make($request->password);
             $userSaved = $user->save();
 
@@ -250,7 +277,7 @@ class AuthController extends Controller
 
         $saved = $recoverCode->save() !== null;
 
-        if ($saved) return true;
+        if ($saved) return $code;
         else return false;
     }
 
@@ -261,5 +288,21 @@ class AuthController extends Controller
             ->roles
             ->pluck('name')
             ->toArray();
+    }
+
+    /**
+     * @param bool|int $code
+     * @param mixed $email
+     * @return void
+     */
+    public function sendRecoverEmail(bool|int $code, string $email, string $user): void
+    {
+        $mailData = ['code' => $code, 'email' => $email];
+        $senderAddress = env('MAIL_FROM_ADDRESS');
+
+        Mail::send('recover-password', $mailData, function ($message) use ($email, $senderAddress) {
+            $message->to($email)->subject('Recuperación de contraseña de Tareas');
+            $message->from($senderAddress, 'Tareas DAW2');
+        });
     }
 }
