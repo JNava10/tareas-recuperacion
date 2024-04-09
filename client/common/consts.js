@@ -21,8 +21,6 @@ export const TOKEN_STORAGE_KEY = 'token';
 export const emailRegex = /[A-Za-z0-9]{4,25}@[A-Za-z]{3,10}.[A-Za-z]{2,7}$/;
 export const passwordRegex = /[\w!"·$%&\/(\\)=?*¿+\-`<>.:,;|@#~½¬{\[\]}ªº]{3,20}/;
 export const userNameRegex = /[A-Za-z]{3,12}/;
-export const userFirstSurnameRegex = userNameRegex;
-export const userSecondSurnameRegex = userNameRegex;
 
 // BULMA //
 

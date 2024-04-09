@@ -26,6 +26,7 @@ export class Fetch {
             const response = await fetch(url, options);
 
             // if (response.status === 403) Common.redirectTo('public/login');
+            console.log(JSON.stringify(jsonBody))
 
             let body = await response.json();
             let data = await body.data;
@@ -33,6 +34,8 @@ export class Fetch {
             if (!data) {
                 return body;
             }
+
+            data.message = body.message
 
             return data;
         } catch (error) {

@@ -26,7 +26,7 @@ export const showAlert = (text, style = colors.success) => {
 
     const alert = document.createElement('div');
 
-    alert.innerHTML = `<div class="notification is-danger is-light">${text}</div>`;
+    alert.innerHTML = `<div class="notification ${style} is-light">${text}</div>`;
 
     document.body.append(alert.firstChild);
 
