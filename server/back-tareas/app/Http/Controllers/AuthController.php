@@ -144,7 +144,7 @@ class AuthController extends Controller
             );
 
             $lastUserCode = RecoverCode::where('user', $user->id)
-                ->orderBy('expires_at', 'desc')
+                ->orderBy('created_at', 'desc')
                 ->first();
 
             if (!$lastUserCode) return Common::sendStdResponse(
@@ -152,15 +152,12 @@ class AuthController extends Controller
                 ['executed' => false]
             );
 
-            if ($lastUserCode->used === false) return Common::sendStdResponse(
+            if ($lastUserCode->used) return Common::sendStdResponse(
                 "El codigo introducido ya ha sido usado.",
                 ['executed' => false]
             );
 
             $codeExpireDate = $lastUserCode->expires_at;
-
-            echo $lastUserCode->code;
-            echo $request->code;
 
             // Comprobamos si el codigo ha expirado comprobando si su fecha de expiracion es superior a la fecha actual.
             if (now()->gt($codeExpireDate)) return Common::sendStdResponse(
@@ -295,9 +292,9 @@ class AuthController extends Controller
      * @param mixed $email
      * @return void
      */
-    public function sendRecoverEmail(bool|int $code, string $email, string $user): void
+    public function sendRecoverEmail(bool|int $code, string $email, mixed $user): void
     {
-        $mailData = ['code' => $code, 'email' => $email];
+        $mailData = ['code' => $code, 'email' => $email, 'user' => $user];
         $senderAddress = env('MAIL_FROM_ADDRESS');
 
         Mail::send('recover-password', $mailData, function ($message) use ($email, $senderAddress) {
