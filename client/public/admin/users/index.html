@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" class="has-background-dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de usuarios</title>
+    <link rel="stylesheet" href="../../../styles/style.css">
+    <link rel="stylesheet" href="../../../styles/users.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<header></header>
+<main>
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered is-vcentered">
+                <div class="column is-half">
+                    <table class="table" id="usersTable">
+                        <thead>
+                        <tr>
+                            <th profilePic field="pic_url"></th>
+                            <th field="id">ID</th>
+                            <th field="name">Nombre</th>
+                            <th field="first_lastname">Primer apellido</th>
+                            <th field="second_lastname">Segundo apellido</th>
+                            <th field="email">Email</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer></footer>
+<!--<script src="../../../dist/users.js"></script>-->
+<script type="module" src="../../../js/users.js"></script>
+</body>
+</html>

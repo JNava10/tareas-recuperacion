@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Mockery\Exception;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
 
@@ -19,14 +20,14 @@ class UserController extends Controller
             if ($users->isEmpty()) {
                 return Common::sendStdResponse(
                     'No hay ningun usuario en el sistema.',
-                    ['users', $users],
+                    ['users' => $users],
                     SymphonyResponse::HTTP_NOT_FOUND
                 );
             }
 
             return Common::sendStdResponse(
                 'Se han obtenido correctamente todos los usuarios.',
-                ['users', $users]
+                ['users' => $users]
             );
         } catch (Exception $exception)
         {
@@ -104,6 +105,19 @@ class UserController extends Controller
 
     function getUsersByFullname(Request $request) {
         try {
+            $validate = Validator::make(
+                $request->all(),
+                [
+                    'search' => 'required|string|max:255'
+                ]
+            );
+
+            if ($validate->fails()) return Common::sendStdResponse(
+                "Revisa la estructura de la petición e intentalo de nuevo.",
+                [false],
+                SymphonyResponse::HTTP_BAD_REQUEST
+            );
+
             $lowerSearch = strtolower($request->search);
 
             $users = User::orWhere( function (Builder $query) use ($lowerSearch) {
@@ -138,6 +152,19 @@ class UserController extends Controller
 
     function getUserByEmail(Request $request) {
         try {
+            $validate = Validator::make(
+                $request->all(),
+                [
+                    'email' => 'required|email|max:255'
+                ]
+            );
+
+            if ($validate->fails()) return Common::sendStdResponse(
+                "Revisa la estructura de la petición e intentalo de nuevo.",
+                [false],
+                SymphonyResponse::HTTP_BAD_REQUEST
+            );
+
             $users = User::where('name', strtolower($request->email))->first();
 
             if ($users->isEmpty()) {
