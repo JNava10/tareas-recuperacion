@@ -15,6 +15,9 @@
         <div class="container">
             <div class="columns is-centered is-vcentered">
                 <div class="column is-half">
+
+                    <!--    Tabla de usuarios     -->
+
                     <table class="table" id="usersTable">
                         <thead>
                         <tr>
@@ -32,9 +35,69 @@
             </div>
         </div>
     </section>
+
+    <!--    Modal de editar usuario-->
+
+    <div id="editUser" class="modal">
+        <!--    Habria que buscar una forma mejor para cerrar los modales, pero no puedo llamar a funciones externas...    -->
+        <div class="modal-background" onclick="document.querySelector('#editUser').classList.remove('is-active')"></div>
+        <div class="modal-content">
+            <div class="box">
+                <div id="editForm">
+                    <div>
+                        <label for="userPic">Foto de perfil</label>
+                        <figure id="userPic" class="image is-square is-32x32"><img class="is-rounded"></figure>
+                        <div class="file is-boxed">
+                            <label class="file-label">
+                                <input class="file-input" type="file" name="resume" />
+                                <span class="file-cta">
+                                  <span class="file-icon">
+                                    <i class="fas fa-upload"></i>
+                                  </span>
+                                  <span class="file-label">Selecciona una foto</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="userFirstName">Nombre</label>
+                        <input id="userFirstName" class="input" field="name">
+                    </div>
+                    <div>
+                        <label for="userFirstLastname">Primer apellido</label>
+                        <input id="userFirstLastname" class="input" field="first_lastname">
+                    </div>
+                    <div>
+                        <label for="userSecondLastname">Segundo apellido</label>
+                        <input id="userSecondLastname"  class="input" field="second_lastname">
+                    </div>
+                    <hr>
+                    <div>
+                        <label for="userPassword" >Contraseña</label>
+                        <input type="password" field="password" class="input" id="userPassword">
+                    </div>
+                    <div>
+                        <label for="userPasswordConfirm">Confirmar contraseña</label>
+                        <input type="password" class="input" id="userPasswordConfirm">
+                    </div>
+                </div>
+
+                <button class="button" id="submitEditBtn">Editar usuario</button>
+            </div>
+        </div>
+
+        <!--        <button class="modal-close is-large" onclick="closeModal('editUser')" aria-label="close"></button>  No funciona -->
+        <button class="modal-close is-large" onclick="document.querySelector('#editUser').classList.remove('is-active')" aria-label="close"></button>
+    </div>
 </main>
 <footer></footer>
 <!--<script src="../../../dist/users.js"></script>-->
 <script type="module" src="../../../js/users.js"></script>
+
+<!--    Importamos el servicio de modal para poder cerrar el modal con su botón.  -->
+<script src="../../../common/services/modal.service.js"></script>
+
+<script src="https://kit.fontawesome.com/c48e0b1fd6.js" crossorigin="anonymous"></script>
+
 </body>
 </html>

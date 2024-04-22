@@ -1,17 +1,22 @@
 import {getAllUsers} from "../common/api/user.api.js";
 import {createElementString} from "../common/services/common.service.js";
+import {openModal} from "../common/services/modal.service.js";
 
 const usersTableBody = document.querySelector('#usersTable tbody');
 const usersTableHeaders = document.querySelectorAll('#usersTable th');
+const submitEdit = document.querySelector('#submitEditBtn');
+const editModalId = 'editUser';
+let userEditing = 0; // ID del usuario que se está editando.
+let users = []
 
 onload = async () => {
     const data = await getAllUsers();
 
-    console.log(data)
+    users = data.users;
 
-    data.users.forEach(user => {
+    users.forEach(user => {
         addUser(user)
-    })
+    });
 }
 
 const addUser = (user) => {
@@ -22,28 +27,54 @@ const addUser = (user) => {
     row.classList.add('is-vcentered')
 
     for (const header of usersTableHeaders) {
-        addRow(header, user, row);
+        const headerFieldname = header.getAttribute('field');
+        const isProfilePic = header.getAttribute('profilePic') !== null;
+        const field = user[headerFieldname];
+
+        if (field) {
+            const column = document.createElement('td');
+
+            if (isProfilePic) {
+                const profilePicHtml = `<figure class="image is-square is-32x32"><img class="is-rounded" src="${field}"></figure>`;
+                const image = createElementString(profilePicHtml);
+
+                column.append(image);
+            } else {
+                column.innerHTML = field;
+            }
+
+            row.append(column);
+        }
     }
+
+    const editButtonHtml = `<td><button data-target="editUser" class="button is-small js-modal-trigger">Editar</button></td>`;
+    const editButtonElement = createElementString(editButtonHtml);
+
+    editButtonElement.onclick = () => openEditModal(user);
+
+    row.append(editButtonElement)
 
     usersTableBody.append(row);
 };
 
-function addRow(header, user, row) {
-    const headerFieldname = header.getAttribute('field');
-    const isProfilePic = header.getAttribute('profilePic') !== null;
-    const field = user[headerFieldname];
+const openEditModal = (user) => {
+    userEditing = user.id;
 
-    if (field) {
-        const column = document.createElement('td');
+    // Buscamos todos los inputs del HTML dentro del modal que tengan campos asociados.
+    const modalFields = document.querySelectorAll(`#${editModalId} div input[field]`);
 
-        if (isProfilePic) {
-            console.log(field)
-            const image = createElementString(`<figure class="image is-square is-32x32"><img class="is-rounded" src="${field}"></figure>`)
-            column.append(image)
-        } else {
-            column.innerHTML = field;
-        }
+    modalFields.forEach(input => {
+        const field = input.getAttribute('field');
+        console.log(user[field])
 
-        row.append(column);
-    }
-}
+        if (user[field]) input.value = user[field];
+    });
+
+    openModal(editModalId)
+};
+
+submitEdit.addEventListener('click', () => {
+    const user = users.find(user => user.id === userEditing);
+
+    console.log(user);
+})
