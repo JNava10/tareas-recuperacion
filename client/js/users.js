@@ -1,6 +1,9 @@
 import {getAllUsers} from "../common/api/user.api.js";
 import {createElementString} from "../common/services/common.service.js";
 import {openModal} from "../common/services/modal.service.js";
+import {EditedUser} from "../common/class/user/editedUser.js";
+import * as userApi from "../common/api/user.api.js"
+import {showAlert} from "../common/services/message.service.js";
 
 const usersTableBody = document.querySelector('#usersTable tbody');
 const usersTableHeaders = document.querySelectorAll('#usersTable th');
@@ -65,16 +68,54 @@ const openEditModal = (user) => {
 
     modalFields.forEach(input => {
         const field = input.getAttribute('field');
-        console.log(user[field])
 
         if (user[field]) input.value = user[field];
     });
 
+    const editUserPic = document.querySelector('#userPicEdit')
+    editUserPic.src = user.pic_url
+
     openModal(editModalId)
 };
 
-submitEdit.addEventListener('click', () => {
-    const user = users.find(user => user.id === userEditing);
+// Aqui se crea la peticion y se manda, despues de haber clickado el botón.
+submitEdit.addEventListener('click',async  () => {
+    let user = users.find(user => user.id === userEditing);
+    let formFields = {};
 
-    console.log(user);
+    // Pasamos a array los resultados para poder filtrar.
+    const modalFieldsFilled = Array.from(document.querySelectorAll(`#${editModalId} div input[field]`)).filter(input => input.value !== "");
+
+    // Metemos los datos del formulario en el objeto.
+    modalFieldsFilled.forEach(input => {
+        const field = input.getAttribute('field');
+
+        formFields[field] = input.value;
+    });
+
+    console.log(formFields)
+
+    const editedUser = new EditedUser(
+        user.id.toString(),
+        formFields['name'] || "",
+        formFields['first_lastname'] || "",
+        formFields['second_lastname'] || "",
+        formFields['password'] || "",
+        formFields['profile_pic'] || "",
+    );
+
+    console.log('Edited user', editedUser)
+
+    const keys = Object.keys(editedUser);
+
+
+    // Recorremos las propiedades del objeto, quitando los vacios. Esto limpia el objeto quitando las propiedades que no tienen ningun valor.
+    for (const field of keys) {
+        if (editedUser[field] === "") delete editedUser[field];
+    }
+
+    const body = await userApi.editUser(editedUser);
+    console.log(body.data)
+
+    if (body.data.executed) showAlert('Usuario creado');
 })

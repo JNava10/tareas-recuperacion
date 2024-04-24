@@ -190,4 +190,50 @@ class UserController extends Controller
             );
         }
     }
+
+    function editUserData(Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'id' => 'required|string|max:255',
+                'name' => 'string|max:255',
+                'firstSurname' => 'string|max:255',
+                'secondSurname' => 'string|max:255',
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            [false],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        try {
+            $user = User::find($request->id);
+
+            if ($request->name) $user->name = $request->name;
+            elseif ($request->firstLastname) $user->first_lastname = $request->firstLastname;
+            elseif ($request->secondLastname) $user->second_lastname = $request->secondSurname;
+            else return Common::sendStdResponse(
+                'No se ha indicado ningun campo que actualizar.',
+                ['executed' => false]
+            );
+
+            $user->save();
+
+            return Common::sendStdResponse(
+                'Se ha actualizado el usuario correctamente.',
+                ['executed' => true]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
