@@ -1,12 +1,12 @@
 import {getAllUsers} from "../common/api/user.api.js";
 import {createElementString} from "../common/services/common.service.js";
 import {openModal} from "../common/services/modal.service.js";
-import {EditedUser} from "../common/class/user/editedUser.js";
+import {EditedUser} from "../common/class/user/req/editedUser.js";
 import * as userApi from "../common/api/user.api.js"
 import {showAlert, createControlHelp, resetControl} from "../common/services/message.service.js";
 import {colors} from "../common/consts.js";
 import {regex} from "../common/regex.js";
-import {PasswordEdited} from "../common/class/user/passwordEdited.js";
+import {PasswordEdited} from "../common/class/user/req/passwordEdited.js";
 
 const usersTableBody = document.querySelector('#usersTable tbody');
 const usersTableHeaders = document.querySelectorAll('#usersTable th');
@@ -97,14 +97,27 @@ submitEdit.addEventListener('click',async  () => {
         formFields[field] = input.value;
     });
 
+    console.log(formFields)
+
+    const userData = new EditedUser(
+        user.id.toString(),
+        user.name,
+        user.first_lastname,
+        user.second_lastname
+    )
+
     const editedUser = new EditedUser(
         user.id.toString(),
         formFields['name'] || "",
         formFields['first_lastname'] || "",
-        formFields['second_lastname'] || "",
-        formFields['password'] || "",
-        formFields['profile_pic'] || "",
+        formFields['second_lastname'] || ""
     );
+
+
+    if (userData === editedUser) { // TODO: No funciona.
+        showAlert('No se ha cambiado ningun campo.');
+        return;
+    }
 
     const keys = Object.keys(editedUser);
 
@@ -117,7 +130,7 @@ submitEdit.addEventListener('click',async  () => {
 
     if (data.executed === true) {
         showAlert(message);
-        setTimeout(() => location.reload(), 800); // Añadimos un tiempo de espera para que sea posible leer el mensaje.
+        // setTimeout(() => location.load(), 800); // Añadimos un tiempo de espera para que sea posible leer el mensaje.
     } else {
         showAlert(message, colors.danger);
     }

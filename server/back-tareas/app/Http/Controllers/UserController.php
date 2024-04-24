@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
 
 class UserController extends Controller
 {
-    function getAllUsers() {
+    function userCollection() {
         try {
             $users = User::all();
 
