@@ -32,3 +32,4 @@ export const colors = {
     warning: 'is-warning',
     danger: 'is-danger',
 }
+

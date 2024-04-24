@@ -4,6 +4,12 @@
     --link-color: #543fd7;
 }
 
+.notification {
+    width: 50%;
+    position: absolute;
+    top: 90%;
+}
+
 a {
     color: var(--link-color);
 }
