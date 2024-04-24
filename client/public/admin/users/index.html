@@ -11,6 +11,7 @@
 <body>
 <header></header>
 <main>
+    <script type="module" src="../../../js/users.js"></script>
     <section class="section">
         <div class="container">
             <div class="columns is-centered is-vcentered">
@@ -45,19 +46,17 @@
             <div class="box">
                 <div class="container">
                     <h4 class="title is-4">Foto de perfil</h4>
-                    <div class="control is-flex is-flex-direction-row">
-                        <figure class="image is-square is-64x64"><img id="userPicEdit" class="is-rounded"></figure>
-                        <div class="file is-primary">
+                    <div class="control is-flex is-flex-direction-row is-justify-content-center">
+                        <figure class="image is-square is-64x64 mr-2"><img id="userPicEdit" class="is-rounded"></figure>
+                        <button class="button is-danger is-dark is-normal">
                             <label class="file-label">
-                                <input class="file-input" type="file" name="resume" />
-                                <span class="file-cta">
+                                <input class="file-input" type="file" name="resume"/>
                                 <span class="file-icon">
                                     <i class="fas fa-upload"></i>
                                 </span>
                                 <span class="file-label">Subir foto</span>
-                            </span>
                             </label>
-                        </div>
+                        </button>
                     </div>
                 </div>
                 <hr>
@@ -86,7 +85,7 @@
                     <h4 class="title is-4">Contraseña</h4>
                     <div class="field">
                         <div class="control">
-                            <label for="userPassword" >Contraseña</label>
+                            <label for="userPassword">Contraseña</label>
                             <input type="password" field="password" class="input" id="userPassword">
                         </div>
                     </div>
@@ -98,7 +97,7 @@
                     </div>
                     <div class="field">
                         <div class="control">
-                            <button class="button is-danger is-dark is-medium">Cambiar contraseña</button>
+                            <button class="button is-danger is-dark is-medium" id="sendPassword">Cambiar contraseña</button>
                         </div>
                     </div>
                 </div>

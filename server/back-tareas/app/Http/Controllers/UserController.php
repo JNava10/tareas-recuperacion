@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Mockery\Exception;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
@@ -223,6 +224,43 @@ class UserController extends Controller
 
             return Common::sendStdResponse(
                 'Se ha actualizado el usuario correctamente.',
+                ['executed' => true]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function editUserPassword(Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'id' => 'required|string|max:255',
+                'password' => 'required|string|max:255'
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            [false],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        try {
+            $user = User::find($request->id);
+            $user->password = Hash::make($request->password);
+
+            $user->save();
+
+            return Common::sendStdResponse(
+                'Se ha actualizado la contraseña del usuario correctamente.',
                 ['executed' => true]
             );
         } catch (Exception $exception)

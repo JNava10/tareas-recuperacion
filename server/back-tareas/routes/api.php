@@ -24,4 +24,5 @@ Route::prefix('/user')->group(function () {
     Route::get('email', [UserController::class, 'getUserByEmail']);
 
     Route::put('data', [UserController::class, 'editUserData']);
+    Route::put('password', [UserController::class, 'editUserPassword']);
 });
