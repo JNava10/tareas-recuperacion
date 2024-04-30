@@ -1,8 +1,9 @@
 import {deleteUser, getAllUsers} from "../common/api/user.api.js";
-import {createElementString} from "../common/services/common.service.js";
+import {capitalize, createElementString} from "../common/services/common.service.js";
 import {closeModal, openModal} from "../common/services/modal.service.js";
 import {EditedUser} from "../common/class/user/req/editedUser.js";
 import * as userApi from "../common/api/user.api.js"
+import * as roleApi from "../common/api/role.api.js"
 import {showAlert, createControlHelp, resetControl} from "../common/services/message.service.js";
 import {colors} from "../common/consts.js";
 import {regex} from "../common/regex.js";
@@ -14,7 +15,11 @@ const submitEdit = document.querySelector('#submitEditBtn');
 const sendPasswordBtn = document.querySelector('#sendPassword');
 const deleteUserBtn = document.querySelector('#deleteUserConfirm');
 const restoreUserBtn = document.querySelector('#restoreUserConfirm');
+const createUserBtn = document.querySelector('#createUserBtn');
+const showPasswordButtons = document.querySelectorAll('.show-password');
+const createUserRoleList = document.querySelector('#createUserRoleList');
 
+const createUserModalId = 'createUserModal';
 const editModalId = 'editUser';
 const deleteModalId = 'confirmDeleteModal';
 const restoreModalId = 'confirmRestoreModal';
@@ -23,7 +28,10 @@ let userEditing = 0; // ID del usuario que se está editando.
 let userToDelete = 0; // ID del usuario que va a borrar.
 let userToRestore = 0; // ID del usuario que se va a reactivar.
 
-let users = []
+let userCreating = {};
+
+let users = [];
+let roles = [];
 
 onload = async () => {
     const data = await getAllUsers();
@@ -33,6 +41,10 @@ onload = async () => {
     users.forEach(user => {
         addRow(user)
     });
+
+    const roleData = await roleApi.getAllRoles();
+
+    roles = roleData.roles;
 }
 
 const addRow = (user) => {
@@ -76,9 +88,9 @@ const addRow = (user) => {
     // Añadimos un botón de borrar o reactivar según si el usuario está borrado o no.
     if (user.deleted_at !== null) {
         const restoreButtonHtml = `<td><button data-target=${restoreModalId} class="button is-small js-modal-trigger">Activar</button></td>`;
-
         const restoreButtonElement = createElementString(restoreButtonHtml);
-        restoreButtonElement.onclick = () => openRestoreModal(user)
+
+        restoreButtonElement.onclick = () => openRestoreModal(user);
 
         row.append(restoreButtonElement)
     } else {
@@ -218,7 +230,7 @@ restoreUserBtn.onclick = async () => {
 const openDeleteModal = (user) => {
     userToDelete = user.id;
 
-    openModal(deleteModalId)
+    openModal(deleteModalId);
 };
 
 const openRestoreModal = (user) => {
@@ -226,3 +238,41 @@ const openRestoreModal = (user) => {
 
     openModal(restoreModalId)
 };
+
+createUserBtn.onclick = async () => {
+    openModal(createUserModalId)
+    let user = {}
+
+    roles.forEach(role => {
+        user.roles = new Set();
+
+        const roleItem = createElementString(`<li class="button is-dark is-primary cell ">${capitalize(role.name)}</li>`);
+
+        roleItem.onclick = () => {
+            const active = roleItem.classList.contains('is-active');
+
+            if (!active) roleItem.classList.add('is-active');
+            else roleItem.classList.remove('is-active');
+
+            active ? user.roles.add(role.id) : user.roles.delete(role.id);
+        }
+
+        createUserRoleList.append(roleItem);
+    })
+}
+
+// Con esto conseguimos poder mostrar las contraseñas en los campos que queramos.
+showPasswordButtons.forEach((button) => {
+    const targetId = button.getAttribute('for'); // Este es el atributo for que se menciona en el HTML.
+    const target = document.querySelector(`#${targetId}`);
+
+    button.onclick = () =>  {
+        if (target.type === 'password') {
+            target.type = 'text';
+            button.classList.add('is-active');
+        } else {
+            target.type = 'password';
+            button.classList.remove('is-active');
+        }
+    }
+});

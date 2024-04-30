@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,4 +28,8 @@ Route::prefix('/user')->group(function () {
     Route::put('password', [UserController::class, 'editUserPassword']);
     Route::delete('/{id}', [UserController::class, 'deleteUser']);
     Route::post('restore', [UserController::class, 'restoreUser']);
+});
+
+Route::prefix('/role')->group(function () {
+    Route::get('/', [RoleController::class, 'getAllRoles']);
 });

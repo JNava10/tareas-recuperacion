@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class RoleSeeder extends Seeder
 {
-    static $roles = ['admin', 'developer'];
+    static $roles = ['admin', 'desarrollador'];
 
     /**
      * Run the database seeds.
