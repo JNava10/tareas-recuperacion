@@ -14,9 +14,9 @@ use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
 
 class UserController extends Controller
 {
-    function userCollection() {
+    function getAllUsers() {
         try {
-            $users = User::all();
+            $users = User::withTrashed()->get();
 
             if ($users->isEmpty()) {
                 return Common::sendStdResponse(
@@ -276,12 +276,11 @@ class UserController extends Controller
     }
 
     function deleteUser(int $id) {
-
         try {
             $user = User::find($id);
 
             if (!$user) return Common::sendStdResponse(
-                    'No se ha encontrado ningun usuario coincidente.',
+                    'No se ha encontrado ningun usuario activo que coincida.',
                     ['executed' => false],
                 SymphonyResponse::HTTP_NOT_FOUND
             );
@@ -292,6 +291,53 @@ class UserController extends Controller
             return Common::sendStdResponse(
                 $msg,
                 ['executed' => $deleted]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function restoreUser(Request $request) {
+        try {
+            $validate = Validator::make(
+                $request->all(),
+                [
+                    'id' => 'required|integer|max:255',
+                ]
+            );
+
+            if ($validate->fails()) return Common::sendStdResponse(
+                "Revisa la estructura de la petición e intentalo de nuevo.",
+                [false],
+                SymphonyResponse::HTTP_BAD_REQUEST
+            );
+
+            $user = User::withTrashed()->find($request->id);
+
+            if (!$user) return Common::sendStdResponse(
+                'No se ha encontrado ningun usuario coincidente.',
+                ['executed' => false],
+                SymphonyResponse::HTTP_NOT_FOUND
+            );
+
+            if ($user->deleted_at === null) return Common::sendStdResponse(
+                'El usuario ya estaba activado.',
+                ['executed' => false]
+            );
+
+            $restored = $user->restore();
+            $msg = $restored ? 'Se ha activado el usuario correctamente.' : 'No se ha podido activar el usuario.';
+
+            return Common::sendStdResponse(
+                $msg,
+                ['executed' => $restored]
             );
         } catch (Exception $exception)
         {

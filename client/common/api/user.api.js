@@ -24,3 +24,11 @@ export const editUser = async (editedUser) => {
 export const editUserPassword = async (passwordEdited) => {
     return await Fetch.put('user/password', passwordEdited, [],  false);
 };
+
+export const deleteUser = async (userId) => {
+    return await Fetch.delete('user/', null, [userId],  false);
+};
+
+export const restoreUser = async (userId) => {
+    return await Fetch.post('user/restore', {id: userId},  false);
+};

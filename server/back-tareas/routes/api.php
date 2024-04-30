@@ -18,7 +18,7 @@ Route::prefix('/auth')->group(function () {
 
 Route::prefix('/user')->group(function () {
     Route::get('admin', [UserController::class, 'getAllAdmins']);
-    Route::get('/', [UserController::class, 'userCollection']);
+    Route::get('/', [UserController::class, 'getAllUsers']);
     Route::get('dev', [UserController::class, 'getAllDevelopers']);
     Route::get('fullname', [UserController::class, 'getUsersByFullname']);
     Route::get('email', [UserController::class, 'getUserByEmail']);
@@ -26,4 +26,5 @@ Route::prefix('/user')->group(function () {
     Route::put('data', [UserController::class, 'editUserData']);
     Route::put('password', [UserController::class, 'editUserPassword']);
     Route::delete('/{id}', [UserController::class, 'deleteUser']);
+    Route::post('restore', [UserController::class, 'restoreUser']);
 });

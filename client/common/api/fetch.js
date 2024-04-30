@@ -28,16 +28,7 @@ export class Fetch {
             // if (response.status === 403) Common.redirectTo('public/login');
             console.log(JSON.stringify(jsonBody))
 
-            let body = await response.json();
-            let data = await body.data;
-
-            if (!data) {
-                return body;
-            }
-
-            data.message = body.message
-
-            return data;
+            return await response.json();
         } catch (error) {
             console.log(error)
 
