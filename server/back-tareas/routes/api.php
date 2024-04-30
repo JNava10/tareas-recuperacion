@@ -25,4 +25,5 @@ Route::prefix('/user')->group(function () {
 
     Route::put('data', [UserController::class, 'editUserData']);
     Route::put('password', [UserController::class, 'editUserPassword']);
+    Route::delete('/{id}', [UserController::class, 'deleteUser']);
 });

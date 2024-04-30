@@ -274,4 +274,34 @@ class UserController extends Controller
             );
         }
     }
+
+    function deleteUser(int $id) {
+
+        try {
+            $user = User::find($id);
+
+            if (!$user) return Common::sendStdResponse(
+                    'No se ha encontrado ningun usuario coincidente.',
+                    ['executed' => false],
+                SymphonyResponse::HTTP_NOT_FOUND
+            );
+
+            $deleted = $user->delete();
+            $msg = $deleted ? 'Se ha borrado el usuario correctamente.' : 'No se ha podido borrar el usuario.';
+
+            return Common::sendStdResponse(
+                $msg,
+                ['executed' => $deleted]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
