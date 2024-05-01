@@ -28,6 +28,7 @@ Route::prefix('/user')->group(function () {
     Route::put('password', [UserController::class, 'editUserPassword']);
     Route::delete('/{id}', [UserController::class, 'deleteUser']);
     Route::post('restore', [UserController::class, 'restoreUser']);
+    Route::post('', [UserController::class, 'createUser']);
 });
 
 Route::prefix('/role')->group(function () {

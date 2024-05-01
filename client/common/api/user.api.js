@@ -32,3 +32,7 @@ export const deleteUser = async (userId) => {
 export const restoreUser = async (userId) => {
     return await Fetch.post('user/restore', {id: userId},  false);
 };
+
+export const createUser = async (user) => {
+    return await Fetch.post('user', user,  false);
+};

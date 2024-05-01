@@ -4,7 +4,7 @@ import {closeModal, openModal} from "../common/services/modal.service.js";
 import {EditedUser} from "../common/class/user/req/editedUser.js";
 import * as userApi from "../common/api/user.api.js"
 import * as roleApi from "../common/api/role.api.js"
-import {showAlert, createControlHelp, resetControl} from "../common/services/message.service.js";
+import {showAlert, createControlHelp, resetControl, changeInputColor} from "../common/services/message.service.js";
 import {colors} from "../common/consts.js";
 import {regex} from "../common/regex.js";
 import {PasswordEdited} from "../common/class/user/req/passwordEdited.js";
@@ -18,6 +18,7 @@ const restoreUserBtn = document.querySelector('#restoreUserConfirm');
 const createUserBtn = document.querySelector('#createUserBtn');
 const showPasswordButtons = document.querySelectorAll('.show-password');
 const createUserRoleList = document.querySelector('#createUserRoleList');
+const submitCreateBtn = document.querySelector('#submitCreateBtn');
 
 const createUserModalId = 'createUserModal';
 const editModalId = 'editUser';
@@ -240,25 +241,29 @@ const openRestoreModal = (user) => {
 };
 
 createUserBtn.onclick = async () => {
-    openModal(createUserModalId)
-    let user = {}
+    openModal(createUserModalId);
 
     roles.forEach(role => {
-        user.roles = new Set();
+        userCreating.roles = new Set();
 
         const roleItem = createElementString(`<li class="button is-dark is-primary cell ">${capitalize(role.name)}</li>`);
 
         roleItem.onclick = () => {
             const active = roleItem.classList.contains('is-active');
 
-            if (!active) roleItem.classList.add('is-active');
-            else roleItem.classList.remove('is-active');
-
-            active ? user.roles.add(role.id) : user.roles.delete(role.id);
+            if (!active) {
+                roleItem.classList.add('is-active');
+                userCreating.roles.add(role.id)
+            } else {
+                roleItem.classList.remove('is-active');
+                userCreating.roles.delete(role.id)
+            }
         }
 
         createUserRoleList.append(roleItem);
-    })
+    });
+
+
 }
 
 // Con esto conseguimos poder mostrar las contraseñas en los campos que queramos.
@@ -276,3 +281,47 @@ showPasswordButtons.forEach((button) => {
         }
     }
 });
+
+submitCreateBtn.onclick = () => {
+    const fields = document.querySelectorAll('input.create-user')
+    const fieldsArray = [...fields]; // Convertimos los campos obtenidos a array para poder filtrar despues. Usar el spread operator (...) es igual que usar Array.from().
+    const passwordField = fieldsArray.find(field => field.getAttribute('field') === 'password');
+    const confirmPasswordField = fieldsArray.find(field => field.getAttribute('field') === 'confirmPassword');
+
+    // Guardamos las validaciones en un Map para poder guardar los datos de los campos que se necesiten, y luego se puedan recuperar facilmente.
+    const fieldsValid = new Map();
+    const fieldsInvalid = new Map();
+
+    // Recorremos todos los campos del formulario, para poder obtener su valor y validarlos.
+    fields.forEach(field => {
+        const fieldName = field.getAttribute('field');
+        const value = field.value;
+        const isValid = regex[fieldName].test(value);
+
+        if (isValid) {
+            fieldsValid.set(fieldName, {field: field, isValid: isValid});
+            changeInputColor(field, colors.success);
+        } else {
+            fieldsInvalid.set(fieldName, {field: field, isValid: isValid});
+            changeInputColor(field, colors.danger);
+        }
+
+        if (!field.getAttribute('ignore')) userCreating[fieldName] = value;
+    });
+
+    if (fieldsInvalid.size > 0) {
+        showAlert('Formulario invalido. Revisa los campos marcados en rojo.', colors.danger);
+    } else if (userCreating.roles.size === 0) {
+        showAlert('Debes seleccionar como minimo un rol.', colors.danger);
+    } else if (passwordField.value !== confirmPasswordField.value) {
+        showAlert('Las contraseñas no coinciden.', colors.success);
+    } else if (fieldsValid.size === fields.length && fieldsInvalid.size === 0) {
+        showAlert('Formulario valido!', colors.success);
+        userCreating.roles = Array.from(userCreating.roles) // Convertimos el Set a array para que la API lo interprete correctamente.
+
+        console.log(userCreating)
+
+        // userApi.
+
+    }
+}

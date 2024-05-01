@@ -12,13 +12,11 @@
 <script type="module" src="../../../js/users.js"></script>
 <header></header>
 <main>
-    <script type="module" src="../../../js/users.js"></script>
     <section class="section">
         <div class="container">
             <div class="columns is-centered is-vcentered">
                 <div class="column is-half">
-
-                    <!--    Tabla de usuarios     -->
+                <!--    Tabla de usuarios     -->
 
                     <table class="table" id="usersTable">
                         <thead>
@@ -171,16 +169,20 @@
                     <div class="container">
                         <h4 class="title is-4">Datos del usuario</h4>
                         <div class="field">
-                            <label for="userFirstName">Nombre</label>
-                            <input id="createUserFirstName" class="input" field="name">
+                            <label for="createUserEmail">Email</label>
+                            <input id="createUserEmail" type="email" class="input create-user" field="email" formnovalidate/>
                         </div>
                         <div class="field">
-                            <label for="userFirstLastname">Primer apellido</label>
-                            <input id="createUserFirstLastname" class="input" field="first_lastname">
+                            <label for="createUserFirstName">Nombre</label>
+                            <input id="createUserFirstName" class="input create-user" field="name">
                         </div>
                         <div class="field">
-                            <label for="userSecondLastname">Segundo apellido</label>
-                            <input id="createUserSecondLastname"  class="input" field="second_lastname">
+                            <label for="createUserFirstLastname">Primer apellido</label>
+                            <input id="createUserFirstLastname" class="input create-user" field="first_lastname">
+                        </div>
+                        <div class="field">
+                            <label for="createUserSecondLastname">Segundo apellido</label>
+                            <input id="createUserSecondLastname"  class="input create-user" field="second_lastname">
                         </div>
                     </div>
                     <hr>
@@ -189,8 +191,8 @@
                         <div class="field">
                             <label for="createUserPassword">Contraseña</label>
                             <div class="is-flex is-flex-direction-row">
-                                <input id="createUserPassword" class="input" type="password" field="name">
-                                <button class="button show-password" for="createUserPassword">Ver contraseña</button>
+                                <input id="createUserPassword" class="input create-user" type="password" field="password">
+                                <button class="button show-password create-user" for="createUserPassword">Ver contraseña</button>
                                 <!-- El atributo 'for' es un atributo custom (no está definido como tal, pero podemos 'crearlo' nosotros),
                                 para indicar que campo se quiere mostrar. -->
                             </div>
@@ -198,7 +200,7 @@
                         <div class="field">
                             <label for="createUserConfPassword">Confirmar Contraseña</label>
                             <div class="is-flex is-flex-direction-row">
-                                <input id="createUserConfPassword" class="input" type="password" field="name">
+                                <input id="createUserConfPassword" field="confirmPassword" ignore class="input create-user" type="password"> <!--  Ignore es un atributo customizado para indicar que este campo no debe crearse en el objeto. -->
                                 <button class="button show-password" for="createUserConfPassword">Ver contraseña</button>
                             </div>
                         </div>
