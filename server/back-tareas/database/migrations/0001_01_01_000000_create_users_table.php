@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('first_lastname');
             $table->string('second_lastname');
             $table->string('email')->unique();
-            $table->string('pic_url');
+            $table->string('pic_url')->default('https://i.pravatar.cc/300');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

@@ -282,7 +282,7 @@ showPasswordButtons.forEach((button) => {
     }
 });
 
-submitCreateBtn.onclick = () => {
+submitCreateBtn.onclick = async () => {
     const fields = document.querySelectorAll('input.create-user')
     const fieldsArray = [...fields]; // Convertimos los campos obtenidos a array para poder filtrar despues. Usar el spread operator (...) es igual que usar Array.from().
     const passwordField = fieldsArray.find(field => field.getAttribute('field') === 'password');
@@ -316,12 +316,11 @@ submitCreateBtn.onclick = () => {
     } else if (passwordField.value !== confirmPasswordField.value) {
         showAlert('Las contraseñas no coinciden.', colors.success);
     } else if (fieldsValid.size === fields.length && fieldsInvalid.size === 0) {
-        showAlert('Formulario valido!', colors.success);
         userCreating.roles = Array.from(userCreating.roles) // Convertimos el Set a array para que la API lo interprete correctamente.
 
-        console.log(userCreating)
+        const createdResponse = await userApi.createUser(userCreating);
 
-        // userApi.
-
+        if (createdResponse.data.executed) showAlert(createdResponse.message, colors.success);
+        else showAlert(createdResponse.message, colors.danger);
     }
 }
