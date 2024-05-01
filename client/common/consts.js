@@ -25,11 +25,11 @@ export const userNameRegex = /[A-Za-z]{3,12}/;
 // BULMA //
 
 export const colors = {
-    primary: 'is-primary',
-    link: 'is-link',
-    info: 'is-info',
-    success: 'is-success',
-    warning: 'is-warning',
-    danger: 'is-danger',
+    primary: 'primary',
+    link: 'link',
+    info: 'info',
+    success: 'success',
+    warning: 'warning',
+    danger: 'danger',
 }
 

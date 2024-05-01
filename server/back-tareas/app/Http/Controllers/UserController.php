@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\helpers\Common;
+use App\Models\AssignedRoles;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,9 +15,9 @@ use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
 
 class UserController extends Controller
 {
-    function userCollection() {
+    function getAllUsers() {
         try {
-            $users = User::all();
+            $users = User::withTrashed()->get();
 
             if ($users->isEmpty()) {
                 return Common::sendStdResponse(
@@ -262,6 +263,148 @@ class UserController extends Controller
             return Common::sendStdResponse(
                 'Se ha actualizado la contraseña del usuario correctamente.',
                 ['executed' => true]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function deleteUser(int $id) {
+        try {
+            $user = User::find($id);
+
+            if (!$user) return Common::sendStdResponse(
+                    'No se ha encontrado ningun usuario activo que coincida.',
+                    ['executed' => false],
+                SymphonyResponse::HTTP_NOT_FOUND
+            );
+
+            $deleted = $user->delete();
+            $msg = $deleted ? 'Se ha borrado el usuario correctamente.' : 'No se ha podido borrar el usuario.';
+
+            return Common::sendStdResponse(
+                $msg,
+                ['executed' => $deleted]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function restoreUser(Request $request) {
+        try {
+            $validate = Validator::make(
+                $request->all(),
+                [
+                    'id' => 'required|integer|max:255',
+                ]
+            );
+
+            if ($validate->fails()) return Common::sendStdResponse(
+                "Revisa la estructura de la petición e intentalo de nuevo.",
+                [false],
+                SymphonyResponse::HTTP_BAD_REQUEST
+            );
+
+            $user = User::withTrashed()->find($request->id);
+
+            if (!$user) return Common::sendStdResponse(
+                'No se ha encontrado ningun usuario coincidente.',
+                ['executed' => false],
+                SymphonyResponse::HTTP_NOT_FOUND
+            );
+
+            if ($user->deleted_at === null) return Common::sendStdResponse(
+                'El usuario ya estaba activado.',
+                ['executed' => false]
+            );
+
+            $restored = $user->restore();
+            $msg = $restored ? 'Se ha activado el usuario correctamente.' : 'No se ha podido activar el usuario.';
+
+            return Common::sendStdResponse(
+                $msg,
+                ['executed' => $restored]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function createUser(Request $request) {
+        try {
+            $validate = Validator::make(
+                $request->all(),
+                [
+                    'name' => 'required|string|max:255',
+                    'email' => 'required|string|max:255',
+                    'first_lastname' => 'required|string|max:255',
+                    'second_lastname' => 'required|string|max:255',
+                    'password' => 'required|string|max:255',
+                    'roles' => 'array',
+                    'roles.*' => 'integer|required|max:255'
+                ]
+            );
+
+            if ($validate->fails()) return Common::sendStdResponse(
+                "Revisa la estructura de la petición e intentalo de nuevo.",
+                [false],
+                SymphonyResponse::HTTP_BAD_REQUEST
+            );
+
+            $emailExists = User::where('email', $request->email)->exists();
+
+            if ($emailExists) return Common::sendStdResponse(
+                'Ya existe un usuario con el correo electronico indicado.',
+                ['executed' => false]
+            );
+
+            $user = new User();
+
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->first_lastname = $request->first_lastname;
+            $user->second_lastname = $request->second_lastname;
+            $user->password = Hash::make($request->password);
+
+            $saved = $user->save();
+            $userId = User::where('email', $request->email)->first()->id;
+
+
+            foreach ($request->roles as $roleId) {
+                $assignedRole = new AssignedRoles();
+
+                $assignedRole->user_id = $userId;
+                $assignedRole->role_id = $roleId;
+                $assignedRole->created_at = now();
+                $assignedRole->updated_at = now();
+                $assignedRole->save();
+            }
+
+            return Common::sendStdResponse(
+                'Se ha guardado el usuario correctamente.',
+                ['executed' => $saved]
             );
         } catch (Exception $exception)
         {

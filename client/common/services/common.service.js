@@ -17,3 +17,7 @@ export const createElementString = (html) => {
 
     return temp;
 }
+
+export const capitalize = (string) => {
+    return `${string[0].toUpperCase()}${string.slice(1)}`
+}

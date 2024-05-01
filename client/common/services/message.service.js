@@ -14,6 +14,48 @@ export const setInputSuccess = (input, message = '') => {
     input.classList.add('has-text-success');
 }
 
+export const changeInputColor = (input, color) => {
+    if (!Object.values(colors).includes(color)) {
+        console.warn('El color introducido no es valido. Debe formar parte de los colores de Bulma.');
+        return;
+    }
+
+    // Seleccionamos la etiqueta asociada al input introducido, para cambiar su estilo.
+    const label = document.querySelector(`label[for=${input.id}]`);
+
+    if (!label) {
+        console.warn('El campo introducido debe temer una etiqueta.');
+        return;
+    }
+
+    // Aqui convertimos en un array las clases del input para poder filtrar solo los que queremos borrar.
+    const classesToRemoveInput = Array.from(input.classList).filter(className => {
+        return className.startsWith('has-text-') || className.startsWith('is-');
+    })
+
+    const classesToRemoveLabel = Array.from(label.classList).filter(className => {
+        return className.startsWith('has-text-');
+    })
+
+    if (classesToRemoveInput.length > 0 ||  classesToRemoveLabel.length > 0 ) {
+
+        // Borramos las clases que no queremos.
+        classesToRemoveInput.forEach(className => {
+            input.classList.remove(className)
+        });
+
+        classesToRemoveLabel.forEach(className => {
+            label.classList.remove(className)
+        });
+    }
+
+    if (label) {
+        label.classList.add(`has-text-${color}`);
+    }
+
+    input.classList.add(`has-text-${color}`, `is-${color}`);
+}
+
 /**
  *
  * @param text {string}
@@ -27,7 +69,7 @@ export const showAlert = (text, style = colors.success) => {
 
     const alert = document.createElement('div');
 
-    alert.innerHTML = `<div style="z-index: 9999" class="container notification ${style} is-light">${text}</div>`;
+    alert.innerHTML = `<div style="z-index: 9999" class="container notification is-${style} is-light">${text}</div>`;
 
     document.body.append(alert.firstChild);
 
