@@ -1,0 +1,14 @@
+input.title {
+    outline: none;
+    background: none;
+    border: none;
+}
+
+input.title:active {
+    outline: none;
+    background: none;
+}
+
+.card {
+    height: 100%;
+}
