@@ -9,6 +9,10 @@ input.title:active {
     background: none;
 }
 
-.card {
-    height: 100%;
+progress {
+    margin-bottom: 0
+}
+
+.task-data {
+    align-items: center;
 }
