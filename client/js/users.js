@@ -1,6 +1,6 @@
 import {deleteUser, getAllUsers} from "../common/api/user.api.js";
 import {capitalize, createElementString} from "../common/services/common.service.js";
-import {closeModal, openModal} from "../common/services/modal.service.js";
+import {closeModalById, openModalById} from "../common/services/modal.service.js";
 import {EditedUser} from "../common/class/user/req/editedUser.js";
 import * as userApi from "../common/api/user.api.js"
 import * as roleApi from "../common/api/role.api.js"
@@ -121,7 +121,7 @@ const openEditModal = (user) => {
     const editUserPic = document.querySelector('#userPicEdit')
     editUserPic.src = user.pic_url
 
-    openModal(editModalId)
+    openModalById(editModalId)
 };
 
 // Aqui se crea la peticion y se manda, despues de haber clickado el botón.
@@ -211,7 +211,7 @@ deleteUserBtn.onclick = async () => {
     if (data.executed) showAlert(message, colors.success);
     else showAlert(message, colors.danger);
 
-    closeModal(deleteModalId);
+    closeModalById(deleteModalId);
 
     setTimeout(() => location.reload(), 800); // Añadimos un tiempo de espera para que sea posible leer el mensaje.
 }
@@ -223,7 +223,7 @@ restoreUserBtn.onclick = async () => {
     if (data.executed) showAlert(message, colors.success);
     else showAlert(message, colors.danger);
 
-    closeModal(restoreModalId);
+    closeModalById(restoreModalId);
 
     setTimeout(() => location.reload(), 800); // Añadimos un tiempo de espera para que sea posible leer el mensaje.
 }
@@ -231,17 +231,17 @@ restoreUserBtn.onclick = async () => {
 const openDeleteModal = (user) => {
     userToDelete = user.id;
 
-    openModal(deleteModalId);
+    openModalById(deleteModalId);
 };
 
 const openRestoreModal = (user) => {
     userToDelete = user.id;
 
-    openModal(restoreModalId)
+    openModalById(restoreModalId)
 };
 
 createUserBtn.onclick = async () => {
-    openModal(createUserModalId);
+    openModalById(createUserModalId);
 
     roles.forEach(role => {
         userCreating.roles = new Set();

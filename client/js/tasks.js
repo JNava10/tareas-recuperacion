@@ -1,6 +1,6 @@
 import {getAllTasks} from "../common/api/task.api.js";
 import {capitalize, createElementString} from "../common/services/common.service.js";
-import {closeModal, openModal} from "../common/services/modal.service.js";
+import {closeModalById, openModalById, openModal, closeModal, createModal} from "../common/services/modal.service.js";
 import {colors} from "../common/consts.js";
 import * as taskApi from "../common/api/task.api.js"
 import {showAlert} from "../common/services/message.service.js";
@@ -46,6 +46,46 @@ const addTask = (task) => {
 
     const assignTaskButton = taskCardElement.querySelector('.assign-task');
     const removeTaskButton = taskCardElement.querySelector('.remove-task');
+
+    taskCardElement.onclick = () => {
+        const editUserForm = `<div>
+            <h3>Editar tarea</h3>
+            <div class="field">
+              <label class="label">Nombre</label>
+              <div class="control">
+                <input class="input" type="text" placeholder="Text input">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Descripción</label>
+              <div class="control">
+                <input class="input" type="text" placeholder="Text input">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Horas planeadas</label>
+              <div class="control">
+                <input class="input" type="text" placeholder="Text input">
+              </div>
+            </div>
+             <div class="field">
+              <label class="label">Horas realizadas</label>
+              <div class="control">
+                <input class="input" type="text" placeholder="Text input">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Progreso</label>
+              <div class="control">
+                <input class="input" type="text" placeholder="Text input">
+              </div>
+            </div>
+        </div>`
+
+        createModal()
+
+        // taskCardElement.setAttribute('data-target', modalElement.id)
+    }
 
     removeTaskButton.onclick = async () => {
         const {data, message} = await taskApi.removeTask(task.id);
