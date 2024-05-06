@@ -20,12 +20,11 @@ export const closeModal = element => {
     element.classList.remove('is-active');
 };
 
-export const createModal = bodyHtml => {
+export const createModal = bodyElement => {
     const modalHtml = `<div id="task-modal" class="modal">
           <div class="modal-background"></div>
           <div class="modal-content">
             <div class="box">
-            ${bodyHtml}
             </div>
           </div>
           <button class="modal-close is-large" aria-label="close"></button>
@@ -33,10 +32,16 @@ export const createModal = bodyHtml => {
 
 
     const modalElement = createElementString(modalHtml);
+    modalElement.querySelector(`.box`).append(bodyElement);
+
+    modalElement.querySelector('.modal-close, .modal-background').onclick = () => {
+        closeModal(modalElement);
+        modalElement.remove();
+    }
 
     document.body.append(modalElement);
 
-    return modalElement
+    return modalElement;
 };
 
 

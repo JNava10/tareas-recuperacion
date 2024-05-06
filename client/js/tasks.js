@@ -4,6 +4,7 @@ import {closeModalById, openModalById, openModal, closeModal, createModal} from 
 import {colors} from "../common/consts.js";
 import * as taskApi from "../common/api/task.api.js"
 import {showAlert} from "../common/services/message.service.js";
+import {changeProgressValue} from "../common/services/input.service.js"
 
 let tasks = [];
 
@@ -17,6 +18,69 @@ onload = async () => {
     tasks.forEach(task => {
         addTask(task)
     });
+}
+
+
+function onClickCard(event, task) {
+    if (event.target.tagName === 'BUTTON' || event.target.closest('button')) return;
+
+    const editUserFormHtml = `<div>
+            <h3>Editar tarea</h3>
+            <div class="field">
+              <label class="label">Nombre</label>
+              <div class="control">
+                <input class="input" type="text" field="name" value="${task.name}">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Descripción</label>
+              <div class="control">
+                <input class="input" type="text" field="description" value="${task.description}">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Horas planeadas</label>
+              <div class="control">
+                <input class="input" type="text" field="scheduledHours" value="${task.scheduled_hours}">
+              </div>
+            </div>
+             <div class="field">
+              <label class="label">Horas realizadas</label>
+              <div class="control">
+                <input class="input" type="text" field="realizedHours" value="${task.realized_hours}">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Progreso</label>
+              <div class="control">
+                <progress class="progress" field="progress" value="${task.progress}" max="100"></progress>
+              </div>
+            </div>
+            <button class="button" id="submitEditForm">Guardar cambios</button>
+        </div>`
+
+    const editUserForm = createElementString(editUserFormHtml);
+
+    editUserForm.querySelector('.progress').onclick = (event) => changeProgressValue(event);
+
+    const name = editUserForm.querySelector('input[field="name"]').value;
+    const description = editUserForm.querySelector('input[field="description"]').value;
+    const scheduledHours = editUserForm.querySelector('input[field="scheduledHours"]').value;
+    const realizedHours = editUserForm.querySelector('input[field="realizedHours"]').value;
+    const progress = editUserForm.querySelector('progress[field="progress"]').value;
+
+    editUserForm.querySelector('#submitEditForm').onclick = () => sendEditData(
+        task.id,
+        name,
+        description,
+        scheduledHours,
+        realizedHours,
+        progress
+    )
+
+    const modalElement = createModal(editUserForm);
+
+    openModal(modalElement);
 }
 
 const addTask = (task) => {
@@ -47,45 +111,7 @@ const addTask = (task) => {
     const assignTaskButton = taskCardElement.querySelector('.assign-task');
     const removeTaskButton = taskCardElement.querySelector('.remove-task');
 
-    taskCardElement.onclick = () => {
-        const editUserForm = `<div>
-            <h3>Editar tarea</h3>
-            <div class="field">
-              <label class="label">Nombre</label>
-              <div class="control">
-                <input class="input" type="text" placeholder="Text input">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">Descripción</label>
-              <div class="control">
-                <input class="input" type="text" placeholder="Text input">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">Horas planeadas</label>
-              <div class="control">
-                <input class="input" type="text" placeholder="Text input">
-              </div>
-            </div>
-             <div class="field">
-              <label class="label">Horas realizadas</label>
-              <div class="control">
-                <input class="input" type="text" placeholder="Text input">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">Progreso</label>
-              <div class="control">
-                <input class="input" type="text" placeholder="Text input">
-              </div>
-            </div>
-        </div>`
-
-        createModal()
-
-        // taskCardElement.setAttribute('data-target', modalElement.id)
-    }
+    taskCardElement.querySelector('.card-content').onclick = (event) => onClickCard(event, task);
 
     removeTaskButton.onclick = async () => {
         const {data, message} = await taskApi.removeTask(task.id);
@@ -99,6 +125,19 @@ const addTask = (task) => {
 
     taskList.append(taskCardElement);
 };
+
+const sendEditData = async (id, name, description, scheduledHours, realizedHours, progress) => {
+    const editedTask = {
+        name,
+        description,
+        scheduledHours,
+        realizedHours,
+        progress
+    }
+
+    const {message, data} = await taskApi.editTask(editedTask);
+};
+
 
 const calculateProgressColor = (progress) => {
     if (progress > 0 && progress <= 25) return colors.danger;
