@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('progress')->default(rand(1, 100));
             $table->unsignedBigInteger('diff_id');
             $table->timestamps();
+            $table->softDeletes();
             $table->timestamp('completed_at')->nullable();
             $table->foreign('diff_id')->references('id')->on('difficulties');
         });

@@ -38,4 +38,36 @@ class TaskController extends Controller
             );
         }
     }
+
+    function deleteTask(int $id) {
+        try {
+            $task = Task::find($id);
+
+            if (!$task) {
+                return Common::sendStdResponse(
+                    'No hay ninguna tarea coincidente.',
+                    ['tasks' => $task],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            if ($task->user()) $task->user()->delete();
+
+            $deleted = $task->delete();
+
+            return Common::sendStdResponse(
+                'Se ha borrado la tarea correctamente.',
+                ['executed' => $deleted]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }

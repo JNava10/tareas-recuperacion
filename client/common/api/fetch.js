@@ -128,6 +128,11 @@ export class Fetch {
     static async delete(route, body, args, sendToken = true) {
         let url = `${CONSTANTS.API_URL}/${route}`;
 
+        if (!url.endsWith('/')) {
+            url = url.concat('/')
+        }
+
+
         const options = {
             method: CONSTANTS.REST_METHODS.DELETE,
             headers: {}
@@ -140,8 +145,6 @@ export class Fetch {
         }
 
         if (args) url += `${args}`;
-
-        console.log(url);
 
         if (sendToken === true) {
             const token = localStorage.getItem(TOKEN_STORAGE_KEY) || null;

@@ -38,4 +38,5 @@ Route::prefix('/role')->group(function () {
 
 Route::prefix('/task')->group(function () {
     Route::get('/', [TaskController::class, 'getAllTasks']);
+    Route::delete('/{id}', [TaskController::class, 'deleteTask']);
 });
