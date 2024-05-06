@@ -10,4 +10,6 @@ export const changeProgressValue = (event) => {
     // if (progress === event.target.value) return;
 
     event.target.value = progress;
+
+    console.log(progress)
 }

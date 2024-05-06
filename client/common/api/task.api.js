@@ -3,7 +3,7 @@ import {EditedUser} from "../class/user/req/editedUser.js";
 import {PasswordEdited} from "../class/user/req/passwordEdited.js";
 
 export const editTask = async (editedTask, id) => {
-    return await Fetch.put('task', editedTask, id, false);
+    return await Fetch.put('task', editedTask, [id], false);
 };
 
 export const getAllTasks = async () => {

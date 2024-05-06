@@ -10,14 +10,27 @@ let tasks = [];
 
 const taskList = document.querySelector('#taskList');
 
-onload = async () => {
+async function showAllTasks() {
+    if (tasks.length > 0) {
+        taskList.innerHTML = "";
+        tasks = [];
+    }
+
     const data = await getAllTasks();
 
     tasks = data.tasks;
 
-    tasks.forEach(task => {
-        addTask(task)
+    data.tasks.forEach(task => {
+        const taskElement = createTaskElement(task);
+
+        tasks.push(task);
+
+        taskList.append(taskElement);
     });
+}
+
+onload = async () => {
+    await showAllTasks();
 }
 
 
@@ -63,30 +76,36 @@ function onClickCard(event, task) {
 
     editUserForm.querySelector('.progress').onclick = (event) => changeProgressValue(event);
 
-    const name = editUserForm.querySelector('input[field="name"]').value;
-    const description = editUserForm.querySelector('input[field="description"]').value;
-    const scheduledHours = editUserForm.querySelector('input[field="scheduledHours"]').value;
-    const realizedHours = editUserForm.querySelector('input[field="realizedHours"]').value;
-    const progress = editUserForm.querySelector('progress[field="progress"]').value;
+    editUserForm.querySelector('#submitEditForm').onclick = async () => {
+        const name = editUserForm.querySelector('input[field="name"]').value;
+        const description = editUserForm.querySelector('input[field="description"]').value;
+        const scheduledHours = editUserForm.querySelector('input[field="scheduledHours"]').value;
+        const realizedHours = editUserForm.querySelector('input[field="realizedHours"]').value;
+        const progress = editUserForm.querySelector('progress[field="progress"]').value;
 
-    editUserForm.querySelector('#submitEditForm').onclick = () => sendEditData(
-        task.id,
-        name,
-        description,
-        scheduledHours,
-        realizedHours,
-        progress
-    )
+        await sendEditData(
+            task.id,
+            name,
+            description,
+            Number(scheduledHours),
+            Number(realizedHours),
+            Number(progress)
+        );
+
+        closeModal(modalElement);
+
+        await showAllTasks();
+    }
 
     const modalElement = createModal(editUserForm);
 
     openModal(modalElement);
 }
 
-const addTask = (task) => {
+const createTaskElement = (task) => {
     const progressColor = calculateProgressColor(task.progress)
 
-    const taskCardHtml = `<div class="card">
+    const taskCardHtml = `<div class="card" id="${task.id}">
       <div class="card-content">
         <p class="title">${task.name}</p>
         <p class="subtitle">${task.description}</p>
@@ -123,7 +142,7 @@ const addTask = (task) => {
         }
     }
 
-    taskList.append(taskCardElement);
+    return taskCardElement;
 };
 
 const sendEditData = async (id, name, description, scheduledHours, realizedHours, progress) => {
@@ -135,7 +154,12 @@ const sendEditData = async (id, name, description, scheduledHours, realizedHours
         progress
     }
 
-    const {message, data} = await taskApi.editTask(editedTask);
+    console.log(editedTask)
+
+    const {message, data} = await taskApi.editTask(editedTask, id);
+
+    if (data.executed) showAlert(message);
+    else showAlert(message, colors.danger);
 };
 
 
