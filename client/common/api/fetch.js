@@ -83,27 +83,25 @@ export class Fetch {
         }
     }
 
-    static async put(route, jsonBody, args, sendToken = true) {
-        let uri = String(route);
+    static async put(route, body, args, sendToken = true) {
+        let url = `${CONSTANTS.API_URL}/${route}`;
 
-        if (!uri.endsWith('/')) uri += '/';
-
-        let url = `${CONSTANTS.API_URL}/${uri}`;
-
-        if (args) {
-            args.forEach(arg => {
-                url += `${arg}/`
-            });
+        if (!url.endsWith('/')) {
+            url = url.concat('/')
         }
 
         const options = {
-            "method": CONSTANTS.REST_METHODS.PUT,
-            "headers": {
-                "Content-Type": "application/json",
-            },
-
-            "body": JSON.stringify(jsonBody)
+            method: CONSTANTS.REST_METHODS.PUT,
+            headers: {}
         };
+
+        if (body) {
+            options.headers = {};
+            options.headers["Content-Type"] = "application/json"
+            options.body = JSON.stringify(body);
+        }
+
+        if (args) url += `${args}`;
 
         if (sendToken === true) {
             const token = localStorage.getItem(TOKEN_STORAGE_KEY) || null;
@@ -114,19 +112,25 @@ export class Fetch {
         }
 
         try {
+            console.log(options);
+            console.log(args)
             const response = await fetch(url, options);
             const body = await response.json();
 
             return await body;
         } catch (error) {
-            console.log(error)
-
+            console.log(error);
             return false;
         }
     }
 
     static async delete(route, body, args, sendToken = true) {
         let url = `${CONSTANTS.API_URL}/${route}`;
+
+        if (!url.endsWith('/')) {
+            url = url.concat('/')
+        }
+
 
         const options = {
             method: CONSTANTS.REST_METHODS.DELETE,
@@ -140,8 +144,6 @@ export class Fetch {
         }
 
         if (args) url += `${args}`;
-
-        console.log(url);
 
         if (sendToken === true) {
             const token = localStorage.getItem(TOKEN_STORAGE_KEY) || null;
