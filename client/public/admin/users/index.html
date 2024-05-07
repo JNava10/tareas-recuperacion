@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es" class="has-background-dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de usuarios</title>
+    <link rel="stylesheet" href="../../../styles/style.css">
+    <link rel="stylesheet" href="../../../styles/users.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<script type="module" src="../../../js/users.js"></script>
+<header></header>
+<main>
+    <section class="section">
+        <div class="container">
+            <a class="button is-danger" href="../"><i class="fa-solid fa-arrow-left"></i></a>
+
+            <h2 class="title is-h2">Gestionar usuarios</h2>
+
+            <div class="columns is-centered is-vcentered">
+                <div class="column is-half">
+                <!--    Tabla de usuarios     -->
+
+                    <table class="table" id="usersTable">
+                        <thead>
+                        <tr>
+                            <th profilePic field="pic_url"></th>
+                            <th field="id">ID</th>
+                            <th field="name">Nombre</th>
+                            <th field="first_lastname">Primer apellido</th>
+                            <th field="second_lastname">Segundo apellido</th>
+                            <th field="email">Email</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <button class="button" id="createUserBtn">Crear usuario</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--    Modal de editar usuario-->
+
+    <div id="editUser" class="modal">
+        <!--    Habria que buscar una forma mejor para cerrar los modales, pero no puedo llamar a funciones externas...    -->
+        <div class="modal-background" onclick="document.querySelector('#editUser').classList.remove('is-active')"></div>
+        <div class="modal-content">
+            <div class="box">
+                <div class="container">
+                    <h4 class="title is-4">Foto de perfil</h4>
+                    <div class="control is-flex is-flex-direction-row is-justify-content-center">
+                        <figure class="image is-square is-64x64 mr-2"><img id="userPicEdit" class="is-rounded"></figure>
+                        <button class="button is-danger is-dark is-normal">
+                            <label class="file-label">
+                                <input class="file-input" type="file" name="resume"/>
+                                <span class="file-icon">
+                                    <i class="fas fa-upload"></i>
+                                </span>
+                                <span class="file-label">Subir foto</span>
+                            </label>
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                <div class="container" id="editUserData">
+                    <h4 class="title is-4">Datos del usuario</h4>
+                    <div class="field">
+                        <label for="userFirstName">Nombre</label>
+                        <input id="userFirstName" class="input" field="name">
+                    </div>
+                    <div class="field">
+                        <label for="userFirstLastname">Primer apellido</label>
+                        <input id="userFirstLastname" class="input" field="first_lastname">
+                    </div>
+                    <div class="field">
+                        <label for="userSecondLastname">Segundo apellido</label>
+                        <input id="userSecondLastname"  class="input" field="second_lastname">
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-warning is-dark is-medium" id="submitEditBtn">Editar usuario</button>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div id="editUserPassword">
+                    <h4 class="title is-4">Contraseña</h4>
+                    <div class="field">
+                        <div class="control">
+                            <label for="userPassword">Contraseña</label>
+                            <input type="password" field="password" class="input" id="userPassword">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <label for="userPasswordConfirm">Confirmar contraseña</label>
+                            <input type="password" class="input" id="userPasswordConfirm">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-danger is-dark is-medium" id="sendPassword">Cambiar contraseña</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--        <button class="modal-close is-large" onclick="closeModal('editUser')" aria-label="close"></button>  No funciona -->
+        <button class="modal-close is-large" onclick="document.querySelector('#editUser').classList.remove('is-active')" aria-label="close"></button>
+    </div>
+
+
+    <!--    Modal de confirmación de borrar usuario-->
+
+    <div id="confirmDeleteModal" class="modal">
+        <!--    Habria que buscar una forma mejor para cerrar los modales, pero no puedo llamar a funciones externas...    -->
+        <div class="modal-background" onclick="document.querySelector('#confirmDeleteModal').classList.remove('is-active')"></div>
+        <div class="modal-content">
+            <div class="box">
+                <h3>¿Estas seguro de que quieres borrar este usuario?</h3>
+                <div class="container">
+                    <button class="button is-warning is-dark" id="deleteUserConfirm">Si</button>
+                    <button onclick="document.querySelector('#confirmDeleteModal').classList.remove('is-active')" class="button is-dark">No</button>
+                </div>
+            </div>
+        </div>
+
+        <!--        <button class="modal-close is-large" onclick="closeModal('editUser')" aria-label="close"></button>  No funciona -->
+        <button class="modal-close is-large" onclick="document.querySelector('#confirmDeleteModal').classList.remove('is-active')" aria-label="close"></button>
+    </div>
+
+    <!--    Modal de confirmación de restaurar usuario-->
+
+    <div id="confirmRestoreModal" class="modal">
+        <!--    Habria que buscar una forma mejor para cerrar los modales, pero no puedo llamar a funciones externas...    -->
+        <div class="modal-background" onclick="document.querySelector('#confirmRestoreModal').classList.remove('is-active')"></div>
+        <div class="modal-content">
+            <div class="box">
+                <h3>¿Estas seguro de que quieres reactivar este usuario?</h3>
+                <div class="container">
+                    <button class="button is-warning is-dark" id="restoreUserConfirm">Si</button>
+                    <button onclick="document.querySelector('#confirmRestoreModal').classList.remove('is-active')" class="button is-dark">No</button>
+                </div>
+            </div>
+        </div>
+        <button class="modal-close is-large" onclick="document.querySelector('#confirmRestoreModal').classList.remove('is-active')" aria-label="close"></button>
+    </div>
+
+    <div id="createUserModal" class="modal">
+        <div class="modal-background" onclick="document.querySelector('#createUserModal').classList.remove('is-active')"></div>
+        <div class="modal-content">
+            <div class="box">
+                <div class="container">
+                    <h4 class="title is-4">Foto de perfil</h4>
+                    <div class="control is-flex is-flex-direction-row is-justify-content-center">
+                        <figure class="image is-square is-64x64 mr-2"><img id="userPicCreate" class="is-rounded"></figure>
+                        <button class="button is-danger is-dark is-normal">
+                            <label class="file-label">
+                                <input class="file-input" type="file" name="resume"/>
+                                <span class="file-icon">
+                                    <i class="fas fa-upload"></i>
+                                </span>
+                                <span class="file-label">Subir foto</span>
+                            </label>
+                        </button>
+                    </div>
+                    <sub>En caso de no subir ninguna, se establecerá una foto de forma aleatoria.</sub>
+                    <hr>
+                    <div class="container">
+                        <h4 class="title is-4">Datos del usuario</h4>
+                        <div class="field">
+                            <label for="createUserEmail">Email</label>
+                            <input id="createUserEmail" type="email" class="input create-user" field="email" formnovalidate/>
+                        </div>
+                        <div class="field">
+                            <label for="createUserFirstName">Nombre</label>
+                            <input id="createUserFirstName" class="input create-user" field="name">
+                        </div>
+                        <div class="field">
+                            <label for="createUserFirstLastname">Primer apellido</label>
+                            <input id="createUserFirstLastname" class="input create-user" field="first_lastname">
+                        </div>
+                        <div class="field">
+                            <label for="createUserSecondLastname">Segundo apellido</label>
+                            <input id="createUserSecondLastname"  class="input create-user" field="second_lastname">
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="container">
+                        <h4 class="title is-4">Datos del usuario</h4>
+                        <div class="field">
+                            <label for="createUserPassword">Contraseña</label>
+                            <div class="is-flex is-flex-direction-row">
+                                <input id="createUserPassword" class="input create-user" type="password" field="password">
+                                <button class="button show-password create-user" for="createUserPassword">Ver contraseña</button>
+                                <!-- El atributo 'for' es un atributo custom (no está definido como tal, pero podemos 'crearlo' nosotros),
+                                para indicar que campo se quiere mostrar. -->
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="createUserConfPassword">Confirmar Contraseña</label>
+                            <div class="is-flex is-flex-direction-row">
+                                <input id="createUserConfPassword" field="confirmPassword" ignore class="input create-user" type="password"> <!--  Ignore es un atributo customizado para indicar que este campo no debe crearse en el objeto. -->
+                                <button class="button show-password" for="createUserConfPassword">Ver contraseña</button>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="field">
+                        <h4 class="title is-4">Roles</h4>
+                        <div class="control">
+                            <div id="createUserRoleList" class="role-list grid"></div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-success is-dark is-medium" id="submitCreateBtn">Crear usuario</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--        <button class="modal-close is-large" onclick="closeModal('editUser')" aria-label="close"></button>  No funciona -->
+        <button class="modal-close is-large" onclick="document.querySelector('#confirmRestoreModal').classList.remove('is-active')" aria-label="close"></button>
+    </div>
+</main>
+<footer></footer>
+<!--<script src="../../../dist/users.js"></script>-->
+
+<!--    Importamos el servicio de modal para poder cerrar el modal con su botón.  -->
+<script src="../../../common/services/modal.service.js"></script>
+
+<script src="https://kit.fontawesome.com/c48e0b1fd6.js" crossorigin="anonymous"></script>
+
+</body>
+</html>

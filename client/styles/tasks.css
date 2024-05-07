@@ -1,0 +1,18 @@
+input.title {
+    outline: none;
+    background: none;
+    border: none;
+}
+
+input.title:active {
+    outline: none;
+    background: none;
+}
+
+progress {
+    margin-bottom: 0
+}
+
+.task-data {
+    align-items: center;
+}
