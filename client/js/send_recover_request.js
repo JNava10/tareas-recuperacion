@@ -25,14 +25,14 @@ const handleEmailSubmit = async (event) => {
     const emailValue = emailInput.value;
     const data = await authService.sendRecoverRequest(emailValue);
 
-    if (!data.executed) {
+    console.log(data.data.executed)
+
+    if (!data.data.executed) {
         msgService.showAlert('Email invalido, intentalo de nuevo.',  colors.danger);
         return;
     }
 
-    const success = data.executed === true;
-
-    if (success) {
+    if (data.data.executed) {
         msgService.showAlert(data.message,  colors.success);
         sendCodeBtn.disabled = false;
         codeInput.disabled = false;
@@ -52,16 +52,16 @@ const handeCodeSubmit = async (event) => {
     const emailValue = emailInput.value;
     const codeValue = codeInput.value;
 
-    const data = await authService.sendRecoverCode(emailValue, codeValue);
+    const {data, message} = await authService.sendRecoverCode(emailValue, codeValue);
+    console.log(data, )
 
     if (!data.executed) {
-        msgService.showAlert(data.message,  colors.danger);
+        msgService.showAlert(message,  colors.danger);
         return;
     }
 
-    const success = data.executed === true;
 
-    if (success) {
+    if (data.executed === true) {
         msgService.showAlert(data.message,  colors.success);
 
         storageService.add('recover_key', data.key);

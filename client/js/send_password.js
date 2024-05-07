@@ -33,17 +33,17 @@ const handlePasswordSubmit = async (event) => {
 
     const key = storageService.get('recover_key');
     const email = storageService.get('recover_email');
-    const data = await authService.sendPassword(passwordValue, key, email);
+    const {data, message} = await authService.sendPassword(passwordValue, key, email);
 
     if (!data.executed) {
-        msgService.showAlert('Email invalido, intentalo de nuevo.',  colors.danger);
+        msgService.showAlert(message,  colors.danger);
         return;
     }
 
     const success = data.executed === true;
 
     if (success) {
-        msgService.showAlert(data.message,  colors.success);
+        msgService.showAlert('Se ha cambiado la contraseña correctamente',  colors.success);
     }
 };
 

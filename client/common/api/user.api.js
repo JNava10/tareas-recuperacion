@@ -2,6 +2,11 @@ import {Fetch} from "./fetch.js";
 import {EditedUser} from "../class/user/req/editedUser.js";
 import {PasswordEdited} from "../class/user/req/passwordEdited.js";
 
+export const getUserRoles = async () => {
+    return await Fetch.get('user/roles', [], false);
+
+};
+
 
 export const getAllUsers = async () => {
     return await Fetch.get('user', [], false);

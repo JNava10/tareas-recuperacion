@@ -25,7 +25,7 @@ const handleLogin = async (event) => {
 
     const emailValue = emailInput.value;
 
-    const data = await authService.login(emailValue, passwordInput.value)
+    const {data, message} = await authService.login(emailValue, passwordInput.value)
 
     if (!data.logged) {
         msgService.showAlert('Credenciales invalidas, intentalo de nuevo.',  colors.danger)
@@ -39,7 +39,7 @@ const handleLogin = async (event) => {
         document.cookie = ""
         storageService.deleteCookie('token');
 
-        redirectTo('main')
+        redirectTo('');
     }
 };
 
