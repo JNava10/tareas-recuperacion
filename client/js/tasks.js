@@ -38,7 +38,8 @@ function onClickCard(event, task) {
     if (event.target.tagName === 'BUTTON' || event.target.closest('button')) return;
 
     const editUserFormHtml = `<div>
-            <h3>Editar tarea</h3>
+            <sup>*El diseño actual es temporal. Será revisado y cambiado de cara a la siguiente entrega.</sup>
+            <h3 class="title is-3">Editar tarea</h3>
             <div class="field">
               <label class="label">Nombre</label>
               <div class="control">
@@ -140,6 +141,8 @@ const createTaskElement = (task) => {
         } else {
             showAlert(message, colors.danger);
         }
+
+        await showAllTasks()
     }
 
     return taskCardElement;
