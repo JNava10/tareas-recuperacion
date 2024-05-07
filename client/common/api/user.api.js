@@ -36,3 +36,7 @@ export const restoreUser = async (userId) => {
 export const createUser = async (user) => {
     return await Fetch.post('user', user,  false);
 };
+
+export const searchUsers = async (searchInput) => {
+    return await Fetch.get('user', [searchInput],  false);
+};

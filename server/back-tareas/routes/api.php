@@ -30,6 +30,7 @@ Route::prefix('/user')->group(function () {
     Route::delete('/{id}', [UserController::class, 'deleteUser']);
     Route::post('restore', [UserController::class, 'restoreUser']);
     Route::post('', [UserController::class, 'createUser']);
+    Route::get('/search/{searchInput}', [UserController::class, 'searchUser']);
 });
 
 Route::prefix('/role')->group(function () {
@@ -42,5 +43,6 @@ Route::prefix('/task')->group(function () {
     Route::delete('/{id}', [TaskController::class, 'deleteTask']);
     Route::put('/{id}', [TaskController::class, 'editTask']);
     Route::post('/', [TaskController::class, 'createTask']);
-
+    Route::post('/assign/{id}', [TaskController::class, 'assignTask']);
+    Route::post('/unassign/{id}', [TaskController::class, 'unassignTask']);
 });
