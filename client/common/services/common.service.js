@@ -9,7 +9,7 @@ export const wait = (milisecs) => {
 }
 
 // Podemos usar esta funcion para crear elementos HTML de forma mas visual y rapida.
-export const createElementString = (html) => {
+export const createElementFromString = (html) => {
     let temp = document.createElement('div');
 
     temp.innerHTML = html;

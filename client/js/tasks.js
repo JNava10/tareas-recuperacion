@@ -1,5 +1,5 @@
 import {getAllTasks} from "../common/api/task.api.js";
-import {capitalize, createElementString} from "../common/services/common.service.js";
+import {capitalize, createElementFromString} from "../common/services/common.service.js";
 import {closeModalById, openModalById, openModal, closeModal, createModal} from "../common/services/modal.service.js";
 import {colors} from "../common/consts.js";
 import * as taskApi from "../common/api/task.api.js"
@@ -9,6 +9,7 @@ import {changeProgressValue} from "../common/services/input.service.js"
 let tasks = [];
 
 const taskList = document.querySelector('#taskList');
+const mainContainer = document.querySelector('#mainContainer');
 
 async function showAllTasks() {
     if (tasks.length > 0) {
@@ -29,8 +30,84 @@ async function showAllTasks() {
     });
 }
 
+const buildCreateButton = () => {
+    const buttonHtml = `<button id="createTask" class="button">Crear tarea</button>`
+    const buttonElement = createElementFromString(buttonHtml);
+
+    buttonElement.onclick = () => {
+        const createFormHtml =  `<div>
+            <sup>*El diseño actual es temporal. Será revisado y cambiado de cara a la siguiente entrega.</sup>
+            <h3 class="title is-3">Crear tarea</h3>
+            <div class="field">
+              <label class="label">Nombre</label>
+              <div class="control">
+                <input class="input" type="text" field="name">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Descripción</label>
+              <div class="control">
+                <input class="input" type="text" field="description">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Horas planeadas</label>
+              <div class="control">
+                <input class="input" type="text" field="scheduledHours">
+              </div>
+            </div>
+             <div class="field">
+              <label class="label">Horas realizadas</label>
+              <div class="control">
+                <input class="input" type="text" field="realizedHours">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Progreso</label>
+              <div class="control">
+                <progress class="progress" value="0" field="progress" max="100"></progress>
+              </div>
+            </div>
+            <button class="button" id="submitCreateForm">Guardar cambios</button>
+        </div>`;
+
+        const createFormElement = createElementFromString(createFormHtml);
+        const modal = createModal(createFormElement);
+
+        createFormElement.querySelector('progress').onclick = (event) => changeProgressValue(event);
+
+        createFormElement.querySelector('#submitCreateForm').onclick = async () => {
+            const name = createFormElement.querySelector('input[field="name"]').value;
+            const description = createFormElement.querySelector('input[field="description"]').value;
+            const scheduledHours = createFormElement.querySelector('input[field="scheduledHours"]').value;
+            const realizedHours = createFormElement.querySelector('input[field="realizedHours"]').value;
+            const progress = createFormElement.querySelector('progress[field="progress"]').value;
+
+            await sendCreateData(
+                null,
+                name,
+                description,
+                Number(scheduledHours),
+                Number(realizedHours),
+                Number(progress)
+            );
+
+            closeModal(modal);
+
+            await showAllTasks();
+        }
+
+        openModal(modal);
+    }
+
+    return buttonElement;
+};
+
 onload = async () => {
     await showAllTasks();
+
+    const createButton = buildCreateButton();
+    mainContainer.append(createButton);
 }
 
 
@@ -71,9 +148,9 @@ function onClickCard(event, task) {
               </div>
             </div>
             <button class="button" id="submitEditForm">Guardar cambios</button>
-        </div>`
+        </div>`;
 
-    const editUserForm = createElementString(editUserFormHtml);
+    const editUserForm = createElementFromString(editUserFormHtml);
 
     editUserForm.querySelector('.progress').onclick = (event) => changeProgressValue(event);
 
@@ -126,7 +203,7 @@ const createTaskElement = (task) => {
       </div>
     </div>`
 
-    const taskCardElement = createElementString(taskCardHtml);
+    const taskCardElement = createElementFromString(taskCardHtml);
 
     const assignTaskButton = taskCardElement.querySelector('.assign-task');
     const removeTaskButton = taskCardElement.querySelector('.remove-task');
@@ -172,4 +249,19 @@ const calculateProgressColor = (progress) => {
     else if (progress > 50 && progress <= 75) return colors.info;
     else if (progress === 100) return colors.success;
     else if (progress > 75 && progress <= 100) return colors.primary;
+};
+
+const sendCreateData = async (id, name, description, scheduledHours, realizedHours, progress) => {
+    const createdTask = {
+        name,
+        description,
+        scheduledHours,
+        realizedHours,
+        progress
+    }
+
+    const {message, data} = await taskApi.createTask(createdTask);
+
+    if (data.executed) showAlert(message);
+    else showAlert(message, colors.danger);
 };

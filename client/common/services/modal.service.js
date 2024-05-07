@@ -1,6 +1,6 @@
 // Basado en la documentación de Bulma: https://bulma.io/documentation/components/modal/#javascript-implementation-example
 
-import {createElementString} from "./common.service.js";
+import {createElementFromString} from "./common.service.js";
 
 export const openModalById = elementId => {
     const element = document.querySelector(`#${elementId}`);
@@ -31,7 +31,7 @@ export const createModal = bodyElement => {
         </div>`;
 
 
-    const modalElement = createElementString(modalHtml);
+    const modalElement = createElementFromString(modalHtml);
     modalElement.querySelector(`.box`).append(bodyElement);
 
     modalElement.querySelector('.modal-close, .modal-background').onclick = () => {

@@ -1,5 +1,5 @@
 import {colors} from "../consts.js";
-import {createElementString} from "./common.service.js";
+import {createElementFromString} from "./common.service.js";
 
 const alertClass = 'notification';
 
@@ -92,7 +92,7 @@ export const createControlHelp = (input, message, type) => {
         console.error('Not valid parent class. Parent must be control.')
     }
 
-    const helpElement = createElementString(`<span class="help ${type}">${message}</span>`);
+    const helpElement = createElementFromString(`<span class="help ${type}">${message}</span>`);
     input.after(helpElement);
 
     input.classList.add(type)

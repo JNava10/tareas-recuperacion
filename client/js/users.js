@@ -1,5 +1,5 @@
 import {deleteUser, getAllUsers} from "../common/api/user.api.js";
-import {capitalize, createElementString} from "../common/services/common.service.js";
+import {capitalize, createElementFromString} from "../common/services/common.service.js";
 import {closeModalById, openModalById} from "../common/services/modal.service.js";
 import {EditedUser} from "../common/class/user/req/editedUser.js";
 import * as userApi from "../common/api/user.api.js"
@@ -65,7 +65,7 @@ const addRow = (user) => {
 
             if (isProfilePic) {
                 const profilePicHtml = `<figure class="image is-square is-32x32"><img class="is-rounded" src="${field}"></figure>`;
-                const image = createElementString(profilePicHtml);
+                const image = createElementFromString(profilePicHtml);
 
                 column.append(image);
             } else {
@@ -80,7 +80,7 @@ const addRow = (user) => {
 
     // Botón de editar
     const editButtonHtml = `<td><button data-target="editUser" class="button is-small js-modal-trigger">Editar</button></td>`;
-    const editButtonElement = createElementString(editButtonHtml);
+    const editButtonElement = createElementFromString(editButtonHtml);
 
     editButtonElement.onclick = () => openEditModal(user);
 
@@ -89,7 +89,7 @@ const addRow = (user) => {
     // Añadimos un botón de borrar o reactivar según si el usuario está borrado o no.
     if (user.deleted_at !== null) {
         const restoreButtonHtml = `<td><button data-target=${restoreModalId} class="button is-small js-modal-trigger">Activar</button></td>`;
-        const restoreButtonElement = createElementString(restoreButtonHtml);
+        const restoreButtonElement = createElementFromString(restoreButtonHtml);
 
         restoreButtonElement.onclick = () => openRestoreModal(user);
 
@@ -97,7 +97,7 @@ const addRow = (user) => {
     } else {
         const deleteButtonHtml = `<td><button data-target="confirmDeleteModal" class="button is-small js-modal-trigger">Borrar</button></td>`;
 
-        const deleteButtonElement = createElementString(deleteButtonHtml);
+        const deleteButtonElement = createElementFromString(deleteButtonHtml);
         deleteButtonElement.onclick = () => openDeleteModal(user);
 
         row.append(deleteButtonElement)
@@ -246,7 +246,7 @@ createUserBtn.onclick = async () => {
     roles.forEach(role => {
         userCreating.roles = new Set();
 
-        const roleItem = createElementString(`<li class="button is-dark is-primary cell ">${capitalize(role.name)}</li>`);
+        const roleItem = createElementFromString(`<li class="button is-dark is-primary cell ">${capitalize(role.name)}</li>`);
 
         roleItem.onclick = () => {
             const active = roleItem.classList.contains('is-active');
