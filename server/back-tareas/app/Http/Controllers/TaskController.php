@@ -39,6 +39,34 @@ class TaskController extends Controller
             );
         }
     }
+    function getAllDifficulties() {
+        try {
+            $difficulties = Difficulty::all();
+
+            if ($difficulties->isEmpty()) {
+                return Common::sendStdResponse(
+                    'No hay ninguna dificulta de tarea en el sistema.',
+                    ['tasks' => $difficulties],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente las dificultades de tarea.',
+                ['difficulties' => $difficulties]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
 
     function deleteTask(int $id) {
         try {
@@ -112,6 +140,53 @@ class TaskController extends Controller
             return Common::sendStdResponse(
                 'Se ha editado la tarea correctamente.',
                 ['executed' => $edited]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+
+    function createTask(Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'name' => 'string|max:255',
+                'description' => 'string|max:255',
+                'scheduledHours' => 'integer|max:255',
+                'realizedHours' => 'integer|max:255',
+                'progress' => 'integer|max:255',
+                'diffId' => 'integer|max:255',
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            [false],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        try {
+            $task = new Task();
+
+            $task->name = $request->name;
+            $task->description = $request->description;
+            $task->scheduled_hours = $request->scheduledHours;
+            $task->progress = $request->progress;
+            $task->diff_id = $request->diffId;
+
+            $created = $task->save();
+
+            return Common::sendStdResponse(
+                'Se ha creado la tarea correctamente.',
+                ['executed' => $created]
             );
         } catch (Exception $exception)
         {

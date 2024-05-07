@@ -5,11 +5,16 @@ import {colors} from "../common/consts.js";
 import * as taskApi from "../common/api/task.api.js"
 import {showAlert} from "../common/services/message.service.js";
 import {changeProgressValue} from "../common/services/input.service.js"
+import * as userApi from "../common/api/user.api.js";
 
 let tasks = [];
+let users = [];
+const difficultyList = new Map();
 
 const taskList = document.querySelector('#taskList');
 const mainContainer = document.querySelector('#mainContainer');
+
+let difficultySelect;
 
 async function showAllTasks() {
     if (tasks.length > 0) {
@@ -56,22 +61,23 @@ const buildCreateButton = () => {
                 <input class="input" type="text" field="scheduledHours">
               </div>
             </div>
-             <div class="field">
-              <label class="label">Horas realizadas</label>
-              <div class="control">
-                <input class="input" type="text" field="realizedHours">
-              </div>
-            </div>
             <div class="field">
               <label class="label">Progreso</label>
               <div class="control">
                 <progress class="progress" value="0" field="progress" max="100"></progress>
               </div>
             </div>
+            <div class="field">
+              <label class="label">Dificultad</label>
+              <div class="control" id="diffSelectContainer">
+              </div>
+            </div>
             <button class="button" id="submitCreateForm">Guardar cambios</button>
         </div>`;
 
         const createFormElement = createElementFromString(createFormHtml);
+        createFormElement.querySelector(`#diffSelectContainer`).append(difficultySelect);
+
         const modal = createModal(createFormElement);
 
         createFormElement.querySelector('progress').onclick = (event) => changeProgressValue(event);
@@ -80,16 +86,17 @@ const buildCreateButton = () => {
             const name = createFormElement.querySelector('input[field="name"]').value;
             const description = createFormElement.querySelector('input[field="description"]').value;
             const scheduledHours = createFormElement.querySelector('input[field="scheduledHours"]').value;
-            const realizedHours = createFormElement.querySelector('input[field="realizedHours"]').value;
             const progress = createFormElement.querySelector('progress[field="progress"]').value;
+            const diffId = createFormElement.querySelector('select[field="diffId"]').value;
 
             await sendCreateData(
                 null,
                 name,
                 description,
                 Number(scheduledHours),
-                Number(realizedHours),
-                Number(progress)
+                null,
+                Number(progress),
+                Number(diffId)
             );
 
             closeModal(modal);
@@ -106,7 +113,26 @@ const buildCreateButton = () => {
 onload = async () => {
     await showAllTasks();
 
+    const {difficulties} = await taskApi.getAllDifficulties();
+    const userData = await userApi.getAllUsers();
+
+    users = userData.users;
+
+    let options = "";
+
+    difficulties.forEach(difficulty => {
+        difficultyList.set(difficulty.name, difficulty);
+        options = options.concat(`<option value="${difficulty.id}">${difficulty.name}</option>`)
+    });
+
+    const diffSelectHtml = `<div class="select">
+        <select field="diffId">${options}</select>
+    </div>`
+
+    difficultySelect = createElementFromString(diffSelectHtml);
+
     const createButton = buildCreateButton();
+
     mainContainer.append(createButton);
 }
 
@@ -195,8 +221,8 @@ const createTaskElement = (task) => {
         
         <div class="mt-3 is-flex is-align-items-center is-justify-content-space-between">
             <div>
-                <button class="button is-primary is-dark assign-task"><i class="fa-solid fa-user"></i></button>
                 <button class="button is-danger is-dark remove-task"><i class="fa-solid fa-trash"></i></button>
+                <button class="button is-primary is-dark assign-task dropdown-trigger"><i class="fa-solid fa-user"></i></button>
             </div>
             <span class="tag">${task.difficulty.name}</span>
         </div>
@@ -222,6 +248,10 @@ const createTaskElement = (task) => {
         await showAllTasks()
     }
 
+    assignTaskButton.onclick = () => {
+
+    }
+
     return taskCardElement;
 };
 
@@ -233,8 +263,6 @@ const sendEditData = async (id, name, description, scheduledHours, realizedHours
         realizedHours,
         progress
     }
-
-    console.log(editedTask)
 
     const {message, data} = await taskApi.editTask(editedTask, id);
 
@@ -251,13 +279,13 @@ const calculateProgressColor = (progress) => {
     else if (progress > 75 && progress <= 100) return colors.primary;
 };
 
-const sendCreateData = async (id, name, description, scheduledHours, realizedHours, progress) => {
+const sendCreateData = async (id, name, description, scheduledHours, realizedHours, progress, diffId) => {
     const createdTask = {
         name,
         description,
         scheduledHours,
-        realizedHours,
-        progress
+        progress,
+        diffId
     }
 
     const {message, data} = await taskApi.createTask(createdTask);

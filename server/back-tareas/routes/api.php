@@ -38,6 +38,9 @@ Route::prefix('/role')->group(function () {
 
 Route::prefix('/task')->group(function () {
     Route::get('/', [TaskController::class, 'getAllTasks']);
+    Route::get('/difficulties', [TaskController::class, 'getAllDifficulties']);
     Route::delete('/{id}', [TaskController::class, 'deleteTask']);
     Route::put('/{id}', [TaskController::class, 'editTask']);
+    Route::post('/', [TaskController::class, 'createTask']);
+
 });

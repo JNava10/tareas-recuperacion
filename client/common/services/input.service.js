@@ -1,5 +1,7 @@
 // Basado en la documentación de Bulma: https://bulma.io/documentation/components/modal/#javascript-implementation-example
 
+import {createElementFromString} from "./common.service.js";
+
 export const changeProgressValue = (event) => {
     const width = event.target.offsetWidth - event.target.style.borderWidth;
     const rect =  event.target.getBoundingClientRect();

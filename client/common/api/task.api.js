@@ -15,6 +15,10 @@ export const getAllTasks = async () => {
     return await Fetch.get('task', [], false);
 };
 
+export const getAllDifficulties = async () => {
+    return await Fetch.get('task/difficulties', [], false);
+};
+
 export const removeTask = async (id) => {
     return await Fetch.delete('task', [], [id],false);
 };
