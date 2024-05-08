@@ -199,4 +199,65 @@ class TaskController extends Controller
             );
         }
     }
+
+    function assignTask(int $id, Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'userId' => 'integer|max:255',
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            [false],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        try {
+            $task = Task::find($id);
+
+            $task->user_id = $request->userId;
+
+            $updated = $task->save();
+
+            return Common::sendStdResponse(
+                'Se ha asignado la tarea correctamente.',
+                ['executed' => $updated]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function unassignTask(int $id) {
+        try {
+            $task = Task::find($id);
+
+            $task->user_id = null;
+
+            $updated = $task->save();
+
+            return Common::sendStdResponse(
+                'Se ha liberado la tarea correctamente.',
+                ['executed' => $updated]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }

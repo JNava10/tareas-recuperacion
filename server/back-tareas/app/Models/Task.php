@@ -19,8 +19,8 @@ class Task extends Model
         return $this->belongsTo(Difficulty::class, 'diff_id', 'id');
     }
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function user(): BelongsTo
     {
-        return $this->belongsToMany(User::class, 'assigned_tasks', 'user_id', 'task_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

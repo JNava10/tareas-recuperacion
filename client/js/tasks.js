@@ -1,4 +1,4 @@
-import {getAllTasks} from "../common/api/task.api.js";
+import {getAllTasks, removeTask} from "../common/api/task.api.js";
 import {capitalize, createElementFromString} from "../common/services/common.service.js";
 import {closeModalById, openModalById, openModal, closeModal, createModal} from "../common/services/modal.service.js";
 import {colors} from "../common/consts.js";
@@ -6,6 +6,7 @@ import * as taskApi from "../common/api/task.api.js"
 import {showAlert} from "../common/services/message.service.js";
 import {changeProgressValue} from "../common/services/input.service.js"
 import * as userApi from "../common/api/user.api.js";
+import {createUserList, createUserListItem} from "../common/services/flowbite.service.js";
 
 let tasks = [];
 let users = [];
@@ -15,6 +16,7 @@ const taskList = document.querySelector('#taskList');
 const mainContainer = document.querySelector('#mainContainer');
 
 let difficultySelect;
+let timeout;
 
 async function showAllTasks() {
     if (tasks.length > 0) {
@@ -220,9 +222,8 @@ const createTaskElement = (task) => {
         </div>
         
         <div class="mt-3 is-flex is-align-items-center is-justify-content-space-between">
-            <div>
+            <div class="buttons">
                 <button class="button is-danger is-dark remove-task"><i class="fa-solid fa-trash"></i></button>
-                <button class="button is-primary is-dark assign-task dropdown-trigger"><i class="fa-solid fa-user"></i></button>
             </div>
             <span class="tag">${task.difficulty.name}</span>
         </div>
@@ -230,6 +231,17 @@ const createTaskElement = (task) => {
     </div>`
 
     const taskCardElement = createElementFromString(taskCardHtml);
+    const buttonsDiv = taskCardElement.querySelector('.buttons');
+
+    let assignButtonElement;
+
+    if (task.user_id) {
+        assignButtonElement = createElementFromString(`<button class ="button is-success is-dark assign-task dropdown-trigger"><i class="fa-solid fa-user-check"></i></button>`)
+    } else {
+        assignButtonElement = createElementFromString(`<button class="button is-primary is-dark assign-task dropdown-trigger"><i class="fa-solid fa-user"></i></button>`)
+    }
+
+    buttonsDiv.append(assignButtonElement)
 
     const assignTaskButton = taskCardElement.querySelector('.assign-task');
     const removeTaskButton = taskCardElement.querySelector('.remove-task');
@@ -245,11 +257,57 @@ const createTaskElement = (task) => {
             showAlert(message, colors.danger);
         }
 
-        await showAllTasks()
+        await showAllTasks();
     }
 
     assignTaskButton.onclick = () => {
+        const mostSkilledUsers = users // Temporal
+        const searchUserContentHtml = `<div class="mb-3">
+            <div id="searchedList"></div>
+        </div>`;
 
+        const assignTaskContentElement = createElementFromString(searchUserContentHtml);
+
+        if (task.user_id) {
+            const unassignButton = createElementFromString(`<button class="button unassignTask is-danger"><i class="fa-solid fa-user-xmark"></i></button>`)
+            assignTaskContentElement.append(unassignButton);
+
+            assignTaskContentElement.querySelector('.unassignTask').onclick = async () => {
+                const {message, data} = await taskApi.unassignTask(task.id);
+
+                closeModal(searchModal);
+
+                if (data.executed) showAlert(message);
+                else showAlert(message, colors.danger);
+
+                setTimeout(async () => await showAllTasks(), 800) // Aplicamos un timeout para que dé tiempo a leer el mensaje.
+            }
+        }
+
+        const searchModal = createModal(assignTaskContentElement);
+
+        const userList = createUserList();
+
+        mostSkilledUsers.forEach(user => {
+            const userItem = createUserListItem(user.name, user.first_lastname, user.second_lastname, user.pic_url);
+
+            userItem.onclick = async () => {
+                const {message, data} = await taskApi.assignTask(task.id, user.id);
+
+                closeModal(searchModal);
+
+                if (data.executed) showAlert(message);
+                else showAlert(message, colors.danger);
+
+                setTimeout(async () => await showAllTasks(), 800) // Aplicamos un timeout para que dé tiempo a leer el mensaje.
+            }
+
+            userList.append(userItem);
+        });
+
+        assignTaskContentElement.append(userList)
+
+        openModal(searchModal);
     }
 
     return taskCardElement;

@@ -19,10 +19,13 @@ return new class extends Migration
             $table->integer('realized_hours')->default(rand(1, 100));
             $table->integer('progress')->default(rand(1, 100));
             $table->unsignedBigInteger('diff_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
+            $table->timestamp('assigned_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->foreign('diff_id')->references('id')->on('difficulties');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
