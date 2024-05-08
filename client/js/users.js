@@ -84,7 +84,7 @@ const addRow = (user) => {
 
     editButtonElement.onclick = () => openEditModal(user);
 
-    row.append(editButtonElement)
+    row.append(editButtonElement);
 
     // Añadimos un botón de borrar o reactivar según si el usuario está borrado o no.
     if (user.deleted_at !== null) {
@@ -262,8 +262,6 @@ createUserBtn.onclick = async () => {
 
         createUserRoleList.append(roleItem);
     });
-
-
 }
 
 // Con esto conseguimos poder mostrar las contraseñas en los campos que queramos.

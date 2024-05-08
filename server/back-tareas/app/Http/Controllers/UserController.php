@@ -193,6 +193,38 @@ class UserController extends Controller
         }
     }
 
+    function searchUser(string $searchInput) {
+        try {
+            $users = User::whereLike('name', strtolower($searchInput))
+                ->whereLike('first_lastname', strtolower($searchInput))
+                ->whereLike('second_lastname', strtolower($searchInput))
+                ->whereLike('nickname', strtolower($searchInput))
+                ->get();
+
+            if ($users->isEmpty()) {
+                return Common::sendStdResponse(
+                    'No se han encontrado usuarios administradores.',
+                    ['users' => $users, 'executed' => true],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente los usuarios.',
+                ['users' => $users, 'executed' => true]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     function editUserData(Request $request) {
         $validate = Validator::make(
             $request->all(),
