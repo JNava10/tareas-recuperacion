@@ -32,3 +32,7 @@ export const getAllDifficulties = async () => {
 export const removeTask = async (id) => {
     return await Fetch.delete('task', [], [id],false);
 };
+
+export const getAssignedTasks = async (userId) => {
+    return await Fetch.get('task/assigned', [userId],false);
+};

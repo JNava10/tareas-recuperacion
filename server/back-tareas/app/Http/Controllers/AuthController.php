@@ -27,6 +27,7 @@ class AuthController extends Controller
             ]
         );
 
+
         if ($validate->fails()) return Common::sendStdResponse(
             "Revisa la estructura de la petición e intentalo de nuevo.",
             [
@@ -49,6 +50,8 @@ class AuthController extends Controller
 
         $abilities = $this->getUserAbilities($request->email);
 
+        $userId = User::where('email', $request->email)->first(['id'])->id;
+
         $auth = Auth::user();
         $token =  $auth->createToken($request->email, $abilities)->plainTextToken;
 
@@ -56,7 +59,8 @@ class AuthController extends Controller
             "Se ha iniciado sesión correctamente.",
             [
                 "logged" => true,
-                "token" => $token
+                "token" => $token,
+                "userId" => $userId
             ]
         );
     }

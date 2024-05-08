@@ -45,4 +45,7 @@ Route::prefix('/task')->group(function () {
     Route::post('/', [TaskController::class, 'createTask']);
     Route::post('/assign/{id}', [TaskController::class, 'assignTask']);
     Route::post('/unassign/{id}', [TaskController::class, 'unassignTask']);
+
+    Route::get('/assigned/{id}', [TaskController::class, 'getAssignedTasks']);
+
 });

@@ -1,3 +1,4 @@
+import * as storageService from "./storage.service.js";
 
 export const redirectTo = (path) => {
     const serverRoot = window.location.host;
@@ -20,4 +21,8 @@ export const createElementFromString = (html) => {
 
 export const capitalize = (string) => {
     return `${string[0].toUpperCase()}${string.slice(1)}`
+}
+
+export const getUserId = (string) => {
+    return storageService.get('id');
 }
