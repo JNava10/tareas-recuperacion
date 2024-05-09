@@ -19,7 +19,7 @@ export const getRoundedBadge = (content, color) => {
 }
 
 export const getLargeBadge = (content, color) => {
-    const badgeHtml = `<span class="bg-${color}-800 dark:text-${color}-300-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-${color}-900 dark:text-${color}-300">${content}</span>`;
+    const badgeHtml = `<span class="bg-${color}-800 dark:text-${color}-300-100 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-${color}-700 dark:text-${color}-500">${content}</span>`;
 
     console.log(badgeHtml)
 

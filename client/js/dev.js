@@ -1,11 +1,9 @@
 import * as taskApi from "../common/api/task.api.js";
 import {createElementFromString, getUserId} from "../common/services/common.service.js";
 import {colors} from "../common/consts.js";
-import {getUnassignedTaskCard} from "../common/elements/tasks/taskCard.js";
+import {getAddButton, getAssignedTaskCard} from "../common/elements/tasks.js";
 
-const mainContainer = document.querySelector('.container');
-
-let assignedTasks = [];
+const mainContainer = document.querySelector('.main.container');
 
 onload = async () => {
     const userId = getUserId()
@@ -25,11 +23,11 @@ const buildAssignedTasksPanel = (tasks) => {
     const panel = createElementFromString(panelHtml);
     mainContainer.append(panel);
 
-    console.log(tasks)
-
     tasks.forEach(task => {
         const progressColor = calculateProgressColor(task.progress)
-        const taskCard = getUnassignedTaskCard(task).element
+        const taskCard = getAssignedTaskCard(task).element
+        const addButton = getAddButton().element
+
 
         panel.append(taskCard);
     })
