@@ -1,3 +1,7 @@
+html {
+    color-scheme: light dark
+}
+
 :root {
     --background-color: #fff;
     --text-color: #121416d8;
