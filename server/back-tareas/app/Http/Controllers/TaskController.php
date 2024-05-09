@@ -266,8 +266,8 @@ class TaskController extends Controller
 
     function getAssignedTasks(int $id) {
         try {
-            $tasks = Task::with('difficulty')
-                ->where('user_id', $id)
+            $tasks = Task::with(['difficulty', 'assignedBy'])
+                ->where('assigned_to', $id)
                 ->get();
 
             if ($tasks->isEmpty()) {

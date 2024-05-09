@@ -1,6 +1,7 @@
 import * as taskApi from "../common/api/task.api.js";
 import {createElementFromString, getUserId} from "../common/services/common.service.js";
 import {colors} from "../common/consts.js";
+import {getLargeBadge} from "../common/flowbite/badge.js";
 
 const mainContainer = document.querySelector('.container');
 
@@ -42,7 +43,13 @@ const buildAssignedTasksPanel = (tasks) => {
                 <div class="buttons">
                     <button class="button is-danger is-dark remove-task"><i class="fa-solid fa-trash"></i></button>
                 </div>
-                <span class="tag">${task.difficulty.name}</span>
+                
+                ${getLargeBadge(task.difficulty.name, 'gray').html}
+            </div>
+            
+            <div class="mt-3 is-flex is-align-items-center is-justify-content-left">
+                <img class="w-10 h-10 rounded-full mr-2" src="${task.assigned_by.pic_url}" alt="Rounded avatar">
+                <span>${task.assigned_by.name} ${task.assigned_by.first_lastname} ${task.assigned_by.second_lastname}</span>
             </div>
           </div>
         </div>`
