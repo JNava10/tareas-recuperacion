@@ -42,17 +42,9 @@ class UserFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (User $user) {
-            print_r( $this->faker->randomElement(Role::all()->pluck('id')));
             DB::table('assigned_roles')->insert([
                 'user_id' => $user->id,
                 'role_id' => $this->faker->randomElement(Role::all()->pluck('id')),
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-
-            DB::table('assigned_tasks')->insert([
-                'user_id' => $user->id,
-                'task_id' => $this->faker->randomElement(Task::all()->pluck('id')),
                 'created_at' => now(),
                 'updated_at' => now()
             ]);

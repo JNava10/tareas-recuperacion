@@ -205,7 +205,8 @@ class TaskController extends Controller
         $validate = Validator::make(
             $request->all(),
             [
-                'userId' => 'integer|max:255',
+                'assignTo' => 'required|integer|max:255',
+                'assignedBy' => 'required|integer|max:255',
             ]
         );
 
@@ -218,7 +219,8 @@ class TaskController extends Controller
         try {
             $task = Task::find($id);
 
-            $task->user_id = $request->userId;
+            $task->assigned_to = $request->assignTo;
+            $task->assigned_by = $request->assignedBy;
 
             $updated = $task->save();
 

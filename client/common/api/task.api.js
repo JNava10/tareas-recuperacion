@@ -1,14 +1,17 @@
 import {Fetch} from "./fetch.js";
 import {EditedUser} from "../class/user/req/editedUser.js";
 import {PasswordEdited} from "../class/user/req/passwordEdited.js";
+import {getUserId} from "../services/common.service.js";
 
 export const unassignTask = async (id) => {
     return await Fetch.post(`task/unassign/${id}`, null, false);
 };
 
 
-export const assignTask = async (taskId, userId) => {
-    return await Fetch.post(`task/assign/${taskId}`, {userId}, false);
+export const assignTask = async (taskId, userToAssign) => {
+    const clientUserId = getUserId();
+
+    return await Fetch.post(`task/assign/${taskId}`, {assignTo: userToAssign, assignedBy: clientUserId}, false);
 };
 
 

@@ -19,8 +19,13 @@ class Task extends Model
         return $this->belongsTo(Difficulty::class, 'diff_id', 'id');
     }
 
-    public function user(): BelongsTo
+    public function userAssigned(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'assigned_to', 'id');
+    }
+
+    public function assignedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_by', 'id');
     }
 }
