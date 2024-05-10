@@ -1,7 +1,7 @@
 import * as taskApi from "../common/api/task.api.js";
 import {createElementFromString, getUserId} from "../common/services/common.service.js";
 import {colors} from "../common/consts.js";
-import {getAddButton, getAssignedTaskCard} from "../common/elements/tasks.js";
+import {getAssignedTaskCard} from "../common/elements/tasks.js";
 
 const mainContainer = document.querySelector('.main.container');
 
@@ -26,8 +26,6 @@ const buildAssignedTasksPanel = (tasks) => {
     tasks.forEach(task => {
         const progressColor = calculateProgressColor(task.progress)
         const taskCard = getAssignedTaskCard(task).element
-        const addButton = getAddButton().element
-
 
         panel.append(taskCard);
     })
