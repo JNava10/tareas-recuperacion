@@ -48,17 +48,28 @@ export const getAssignedTaskCard = (task) => {
                 ${getLargeBadge(task.difficulty.name, 'gray').html}
             </div>
             </div>
-            <div class="flex">
+            <div class="flex assignedBy">
                 <div class="flex align-items-center justify-content-between mt-4">
                     <img class="w-10 h-10 rounded-full mr-2" src="${task.assigned_by.pic_url}">
                     <span>${task.assigned_by.name} ${task.assigned_by.first_lastname} ${task.assigned_by.second_lastname}</span>
                 </div>
             </div>
+            <div class="buttons"></div>
         </div>`
 
     return {
         html: cardHtml,
         element: createElementFromString(cardHtml)
+    }
+}
+
+export const getReleaseTaskButton = () => {
+    const html =
+        `<button class="text-red-400 bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-900 dark:hover:bg-red-800 focus:outline-none"><i class="fa-solid fa-trash"></i></button>`
+
+    return {
+        html: html,
+        element: createElementFromString(html)
     }
 }
 

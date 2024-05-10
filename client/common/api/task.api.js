@@ -3,6 +3,11 @@ import {EditedUser} from "../class/user/req/editedUser.js";
 import {PasswordEdited} from "../class/user/req/passwordEdited.js";
 import {getUserId} from "../services/common.service.js";
 
+export const releaseTask = async (id) => {
+    return await Fetch.post(`task/release/${id}`, null, false);
+};
+
+
 export const getAvailableTasks = async () => {
     return await Fetch.get(`task/available`, false);
 };
