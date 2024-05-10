@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -54,9 +55,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'assigned_roles', 'user_id', 'role_id');
     }
 
-    public function tasks(): BelongsToMany
+    public function tasks(): HasMany
     {
-        return $this->belongsToMany(Task::class, 'assigned_tasks', 'user_id', 'task_id');
+        return $this->hasMany(Task::class, 'assigned_tasks', 'assigned_to');
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(Task::class, 'assigned_tasks', 'assigned_to');
     }
 
     public function recoverCodes(): HasOne {

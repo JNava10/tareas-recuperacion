@@ -35,7 +35,8 @@ const handleLogin = async (event) => {
         msgService.setInputSuccess(emailInput)
         msgService.setInputSuccess(passwordInput)
 
-        storageService.addCookie('token', data.token);
+        storageService.add('token', data.token);
+        storageService.add('id', data.userId);
         document.cookie = ""
         storageService.deleteCookie('token');
 

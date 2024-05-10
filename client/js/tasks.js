@@ -235,7 +235,7 @@ const createTaskElement = (task) => {
 
     let assignButtonElement;
 
-    if (task.user_id) {
+    if (task.assigned_to) {
         assignButtonElement = createElementFromString(`<button class ="button is-success is-dark assign-task dropdown-trigger"><i class="fa-solid fa-user-check"></i></button>`)
     } else {
         assignButtonElement = createElementFromString(`<button class="button is-primary is-dark assign-task dropdown-trigger"><i class="fa-solid fa-user"></i></button>`)
@@ -268,7 +268,7 @@ const createTaskElement = (task) => {
 
         const assignTaskContentElement = createElementFromString(searchUserContentHtml);
 
-        if (task.user_id) {
+        if (task.assigned_to) {
             const unassignButton = createElementFromString(`<button class="button unassignTask is-danger"><i class="fa-solid fa-user-xmark"></i></button>`)
             assignTaskContentElement.append(unassignButton);
 
