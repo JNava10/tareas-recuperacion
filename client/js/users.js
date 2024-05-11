@@ -8,6 +8,8 @@ import {showAlert, createControlHelp, resetControl, changeInputColor} from "../c
 import {colors} from "../common/consts.js";
 import {regex} from "../common/regex.js";
 import {PasswordEdited} from "../common/class/user/req/passwordEdited.js";
+import {open} from "../common/elements/context_menu/contextMenu.js";
+import {getUserFieldMenu} from "../common/elements/context_menu/userFieldMenu.js";
 
 const usersTableBody = document.querySelector('#usersTable tbody');
 const usersTableHeaders = document.querySelectorAll('#usersTable th');
@@ -47,6 +49,10 @@ onload = async () => {
 
     roles = roleData.roles;
 }
+
+const openUserSummary = () => {
+    // const userSummary =
+};
 
 const addRow = (user) => {
     // Cogemos las cabeceras dentro de la tabla, y haciendo un bucle, comprobamos que campo pertenece a cada uno para
@@ -101,6 +107,14 @@ const addRow = (user) => {
         deleteButtonElement.onclick = () => openDeleteModal(user);
 
         row.append(deleteButtonElement)
+    }
+
+    row.oncontextmenu = (event) => {
+        event.preventDefault();
+
+        const assignedTasksMenu = getUserFieldMenu(user);
+
+        open(assignedTasksMenu, event)
     }
 
     usersTableBody.append(row);
