@@ -299,6 +299,37 @@ class TaskController extends Controller
         try {
             $tasks = Task::with(['difficulty', 'assignedBy'])
                 ->where('assigned_to', $id)
+                ->where('progress', '<', 100)
+                ->get();
+
+            if ($tasks->isEmpty()) {
+                return Common::sendStdResponse(
+                    'El usuario no tiene tareas asignadas.',
+                    ['tasks' => $tasks]
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente todas las tareas asignadas al usuarios.',
+                ['tasks' => $tasks]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function getRealizedTasks(int $id) {
+        try {
+            $tasks = Task::with(['difficulty', 'assignedBy'])
+                ->where('assigned_to', $id)
+                ->where('progress', '=', '100')
                 ->get();
 
             if ($tasks->isEmpty()) {

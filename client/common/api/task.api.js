@@ -47,3 +47,7 @@ export const removeTask = async (id) => {
 export const getAssignedTasks = async (userId) => {
     return await Fetch.get('task/assigned', [userId],false);
 };
+
+export const getRealizedTasks = async (userId) => {
+    return await Fetch.get('task/realized', [userId],false);
+};
