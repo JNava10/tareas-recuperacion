@@ -5,6 +5,8 @@ let current;
 export let isShowing = false;
 
 export const open = (element, event) => {
+    if (current) current.remove()
+
     current = element;
 
     current.classList.add('context-menu')
