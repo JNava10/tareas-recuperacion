@@ -31,6 +31,8 @@ Route::prefix('/user')->group(function () {
     Route::post('restore', [UserController::class, 'restoreUser']);
     Route::post('', [UserController::class, 'createUser']);
     Route::get('/search/{searchInput}', [UserController::class, 'searchUser']);
+
+    Route::put('/roles/{id}', [UserController::class, 'updateUserRoles']);
 });
 
 Route::prefix('/role')->group(function () {

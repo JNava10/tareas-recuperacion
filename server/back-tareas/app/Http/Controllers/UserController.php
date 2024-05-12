@@ -449,4 +449,45 @@ class UserController extends Controller
             );
         }
     }
+
+    function updateUserRoles(int $id, Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'roles' => 'required|array',
+                'roles.*' => 'required|int|max:255'
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            [false],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        try {
+            foreach ($request->roles as $role) {
+                $assignedRole = new AssignedRoles();
+
+                $assignedRole->user_id = $id;
+                $assignedRole->role_id = $role;
+
+                $assignedRole->save();
+            }
+
+            return Common::sendStdResponse(
+                'Se han asignado los roles correctamente.',
+                ['executed' => true]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
