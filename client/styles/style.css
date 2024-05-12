@@ -14,3 +14,8 @@
 a {
     color: var(--link-color);
 }
+
+.context-menu {
+    z-index: 999;
+    position: fixed;
+}
