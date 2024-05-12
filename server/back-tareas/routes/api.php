@@ -33,6 +33,8 @@ Route::prefix('/user')->group(function () {
     Route::get('/search/{searchInput}', [UserController::class, 'searchUser']);
 
     Route::put('/roles/{id}', [UserController::class, 'updateUserRoles']);
+    Route::post('/profile_pic/{userId}', [\App\Http\Controllers\UserController::class, 'changeProfilePic']);
+
 });
 
 Route::prefix('/role')->group(function () {
@@ -52,5 +54,5 @@ Route::prefix('/task')->group(function () {
     Route::get('/assigned/{id}', [TaskController::class, 'getAssignedTasks']);
     Route::get('/realized/{id}', [TaskController::class, 'getRealizedTasks']);
     Route::get('/available', [TaskController::class, 'getAvailableTasks']);
-
+    Route::get('/available', [TaskController::class, 'getAvailableTasks']);
 });

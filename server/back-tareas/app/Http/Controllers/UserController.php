@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Mockery\Exception;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
@@ -489,5 +490,39 @@ class UserController extends Controller
                 SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    public function changeProfilePic(int $userId, Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            ['fails' => $validate->failed(), 'request' =>  $request->all()],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        $file = $request->file('image');
+        $path = $file->store('profile_pìcs', 's3');
+        $url = Storage::disk('s3')->url($path);
+
+        if (!$url) return Common::sendStdResponse(
+            "Ha ocurrido un error al subir la imagen.",
+            [false],
+            SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+        );
+
+        $user = User::find($userId);
+        $user->pic_url = $url;
+        $user->save();
+
+        return Common::sendStdResponse(
+            'Se ha cambiado la foto de perfil correctamente.',
+            ['url' => $url]
+        );
     }
 }
