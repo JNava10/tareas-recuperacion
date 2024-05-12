@@ -18,7 +18,10 @@ const restoreUserBtn = document.querySelector('#restoreUserConfirm');
 const createUserBtn = document.querySelector('#createUserBtn');
 const showPasswordButtons = document.querySelectorAll('.show-password');
 const createUserRoleList = document.querySelector('#createUserRoleList');
+const editUserRoleList = document.querySelector('#editUserRoleList');
 const submitCreateBtn = document.querySelector('#submitCreateBtn');
+const submitEditRolesBtn = document.querySelector('#submitEditRolesBtn');
+
 
 const createUserModalId = 'createUserModal';
 const editModalId = 'editUser';
@@ -26,6 +29,8 @@ const deleteModalId = 'confirmDeleteModal';
 const restoreModalId = 'confirmRestoreModal';
 
 let userEditing = 0; // ID del usuario que se está editando.
+let userEditingRoles = new Set();
+
 let userToDelete = 0; // ID del usuario que va a borrar.
 let userToRestore = 0; // ID del usuario que se va a reactivar.
 
@@ -46,6 +51,8 @@ onload = async () => {
     const roleData = await roleApi.getAllRoles();
 
     roles = roleData.roles;
+
+    console.log(roles)
 }
 
 const addRow = (user) => {
@@ -108,6 +115,7 @@ const addRow = (user) => {
 
 const openEditModal = (user) => {
     userEditing = user.id;
+    userEditingRoles = new Set();
 
     // Buscamos todos los inputs del HTML dentro del modal que tengan campos asociados.
     const modalFields = document.querySelectorAll(`#${editModalId} div input[field]`);
@@ -116,6 +124,26 @@ const openEditModal = (user) => {
         const field = input.getAttribute('field');
 
         if (user[field]) input.value = user[field];
+    });
+
+    roles.forEach(role => {
+        const roleItem = createElementFromString(`<button class="button is-dark is-primary cell ">${capitalize(role.name)}</input>`);
+
+        console.log(role.name)
+
+        roleItem.onclick = () => {
+            const active = roleItem.classList.contains('is-active');
+
+            if (!active) {
+                roleItem.classList.add('is-active');
+                userEditingRoles.add(role.id)
+            } else {
+                roleItem.classList.remove('is-active');
+                userEditingRoles.delete(role.id)
+            }
+        }
+
+        editUserRoleList.append(roleItem);
     });
 
     const editUserPic = document.querySelector('#userPicEdit')
@@ -152,7 +180,6 @@ submitEdit.addEventListener('click',async  () => {
         formFields['first_lastname'] || "",
         formFields['second_lastname'] || ""
     );
-
 
     if (userData === editedUser) { // TODO: No funciona.
         showAlert('No se ha cambiado ningun campo.');
@@ -202,6 +229,24 @@ sendPasswordBtn.onclick = async () => {
     if (data.executed === true) showAlert(message, colors.success);
     else showAlert(message, colors.danger);
     setTimeout(() => location.reload(), 800); // Añadimos un tiempo de espera para que sea posible leer el mensaje.
+}
+submitEditRolesBtn.onclick = async () => {
+    const user = users.find(user => user.id === userEditing);
+    user.roles = [...userEditingRoles.values()]
+
+    if (user.roles.length === 0) {
+        showAlert('No tienes ningun rol seleccionado');
+        return;
+    }
+
+    const {message, data} = await userApi.editUserRoles(user);
+
+    if (data.executed === true) {
+        showAlert(message, colors.success);
+        setTimeout(() => location.reload(), 800); // Añadimos un tiempo de espera para que sea posible leer el mensaje.
+        
+    }
+    else showAlert(message, colors.danger);
 }
 
 // Botón de borrar usuario dentro del modal.

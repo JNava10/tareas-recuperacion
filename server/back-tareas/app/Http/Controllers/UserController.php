@@ -450,13 +450,12 @@ class UserController extends Controller
         }
     }
 
-    function updateUserRoles(Request $request) {
+    function updateUserRoles(int $id, Request $request) {
         $validate = Validator::make(
             $request->all(),
             [
-                'id' => 'required|string|max:255',
                 'roles' => 'required|array',
-                'roles.*' => 'required|number|max:255'
+                'roles.*' => 'required|int|max:255'
             ]
         );
 
