@@ -44,6 +44,34 @@ class UserController extends Controller
         }
     }
 
+    function getUser(int $id) {
+        try {
+            $user = User::with('roles')->find($id);
+
+            if (!$user) {
+                return Common::sendStdResponse(
+                    'No existe ningun usuario coincidente.',
+                    [$user],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente el usuario.',
+                [$user]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     function getAllDevelopers() {
         try {
             // Se usa WhereHas en vez de With para evitar traer todos los registros. Al no ser una consulta join, es necesario para filtrar los resultados.

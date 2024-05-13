@@ -23,6 +23,11 @@ export const getSelfData = async () => {
     return await Fetch.get('user/', [userId], false);
 };
 
+export const signOut = async () => {
+    const userId = getUserId();
+    return await Fetch.post('auth/sign-out', [userId], false);
+};
+
 /**
  *
  * @param {EditedUser} editedUser

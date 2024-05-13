@@ -21,6 +21,7 @@ Route::prefix('/auth')->group(function () {
 Route::prefix('/user')->group(function () {
     Route::get('admin', [UserController::class, 'getAllAdmins']);
     Route::get('/', [UserController::class, 'getAllUsers']);
+    Route::get('/{id}', [UserController::class, 'getUser']);
     Route::get('dev', [UserController::class, 'getAllDevelopers']);
     Route::get('fullname', [UserController::class, 'getUsersByFullname']);
     Route::get('email', [UserController::class, 'getUserByEmail']);
