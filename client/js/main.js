@@ -10,5 +10,5 @@ import * as userApi from "../common/api/user.api.js";
 const userRoles = [];
 
 onload = async () => {
-    const userRoles = await userApi.getUserRoles();
+    const userRoles = await userApi.getSelfRoles();
 }

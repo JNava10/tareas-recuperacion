@@ -33,6 +33,7 @@ Route::prefix('/user')->group(function () {
     Route::get('/search/{searchInput}', [UserController::class, 'searchUser']);
 
     Route::put('/roles/{id}', [UserController::class, 'updateUserRoles']);
+    Route::get('/roles/{id}', [UserController::class, 'getUserRoles']);
     Route::post('/profile_pic/{userId}', [\App\Http\Controllers\UserController::class, 'changeProfilePic']);
 
 });

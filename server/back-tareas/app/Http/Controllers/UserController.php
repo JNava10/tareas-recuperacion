@@ -525,4 +525,32 @@ class UserController extends Controller
             ['url' => $url]
         );
     }
+
+    function getUserRoles(int $id) {
+        try {
+            $user = User::with('roles')->find($id);
+
+            if (!$user) {
+                return Common::sendStdResponse(
+                    'No existe el usuario en el sistema.',
+                    ['users' => $user],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente todos los usuarios.',
+                ['roles' => $user->roles]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
