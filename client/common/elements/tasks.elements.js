@@ -1,5 +1,6 @@
 import {getLargeBadge} from "../flowbite/badge.js";
 import {createElementFromString} from "../services/common.service.js";
+import * as taskApi from "../api/task.api.js";
 
 export const getUnassignedTaskCard = (task) => {
     const cardHtml =
@@ -75,7 +76,6 @@ export const getReleaseTaskButton = () => {
 }
 
 export const getTaskProgressField  = (task) => {
-
     const html =
         `<div>
             <span class="bg-gray-100 mb-3 text-gray-400 text-sm font-medium me-2 px-2 py-0.5 rounded dark:bg-gray-700 dark:text-gray-400">
@@ -92,7 +92,21 @@ export const getTaskProgressField  = (task) => {
 
     const element =  createElementFromString(html);
 
-    element.querySelector('input').oninput = (event) => changeProgressValue(event, element);
+    element.querySelector('input').oninput = (event) => {
+        const progress = event.target.value;
+
+        changeProgressValue(event, element);
+    };
+
+    let timeout;
+
+    element.querySelector('input').onmouseup = (event) => {
+        const progress = event.target.value;
+
+        clearTimeout(timeout);
+
+        timeout = setTimeout(() => taskApi.changeTaskProgress(task.id, progress), 400);
+    };
 
     return {html, element}
 }
