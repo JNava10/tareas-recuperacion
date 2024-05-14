@@ -1,6 +1,5 @@
 import {getLargeBadge} from "../flowbite/badge.js";
 import {createElementFromString} from "../services/common.service.js";
-import {colors} from "../consts";
 
 export const getUnassignedTaskCard = (task) => {
     const cardHtml =
@@ -36,16 +35,8 @@ export const getUnassignedTaskCard = (task) => {
 }
 
 export const getAssignedTaskCard = (task) => {
-    const progressColor = getProgressColor(task);
-
     const cardHtml =
-        `<div class="field">
-             <label class="label">Progreso</label>
-             <div class="control">
-               <progress class="progress" value="0" field="progress" max="100"></progress>
-             </div>
-        </div>
-        <div class="max-w-sm p-5 bg-gray-100 border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700">
+        `<div class="max-w-sm p-5 bg-gray-100 border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700">
             <div class="flex">
                 <div class="w-4/5 mr-2">
                 <div>
@@ -63,6 +54,7 @@ export const getAssignedTaskCard = (task) => {
                     <span>${task.assigned_by.name} ${task.assigned_by.first_lastname} ${task.assigned_by.second_lastname}</span>
                 </div>
             </div>
+            <div class="field progress-field"></div>
             <div class="buttons"></div>
         </div>`
 
@@ -83,48 +75,31 @@ export const getReleaseTaskButton = () => {
 }
 
 export const getTaskProgressField  = (task) => {
+
     const html =
-        `<div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-            <div class="bg-blue-600 h-2.5 rounded-full dark:bg-blue-500" style="width: ${task.progress}"></div>
-        </div>
-        <div class="max-w-xs mx-auto">
-            <label for="bedrooms-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Choose quantity:</label>
-            <div class="relative flex items-center max-w-[11rem]">
-                <button type="button" id="decrement-button" data-input-counter-decrement="bedrooms-input" class="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none">
-                    <i class="fa-solid fa-minus"></i>
-                </button>
-                <input type="text" field="progress" data-input-counter data-input-counter-min="1" data-input-counter-max="5" aria-describedby="helper-text-explanation" class="bg-gray-50 border-x-0 border-gray-300 h-11 font-medium text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full pb-6 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="" value="3" required />
-                <div class="absolute bottom-1 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 flex items-center text-xs text-gray-400 space-x-1 rtl:space-x-reverse">
-                    <i class="fa-solid fa-percent"></i>
-                    Progreso
-                </div>
-                <button type="button" id="increment-button" data-input-counter-increment="bedrooms-input" class="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
+        `<div>
+            <span class="bg-gray-100 mb-3 text-gray-400 text-sm font-medium me-2 px-2 py-0.5 rounded dark:bg-gray-700 dark:text-gray-400">
+                ${task.progress}
+                <i class="fa-solid fa-percent text-gray-400"></i>
+            </span>
+            <div class="w-full mt-2 bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 grid">
+                 <div class="relative">
+                    <div class="absolute z-10 bg-blue-600 h-2.5 rounded-full progress-bar" style="width: ${task.progress}%"></div>
+                    <input id="minmax-range" type="range" min="1" max="99" value="${task.progress}" class="absolute bg-transparent z-20 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-700">
+                 </div>
             </div>
         </div>`;
 
     const element =  createElementFromString(html);
 
-    element.querySelector('.progress').onclick = (event) => changeProgressValue(event);
+    element.querySelector('input').oninput = (event) => changeProgressValue(event, element);
 
     return {html, element}
 }
 
-const getProgressColor = (progress) => {
-    if (progress > 0 && progress <= 25) return colors.danger;
-    else if (progress > 25 && progress <= 50) return colors.warning;
-    else if (progress > 50 && progress <= 75) return colors.info;
-    else if (progress === 100) return colors.success;
-    else if (progress > 75 && progress <= 100) return colors.primary;
-};
+const changeProgressValue = (event, element) => {
+    const progress = event.target.value;
 
-const changeProgressValue = (event) => {
-    const width = event.target.offsetWidth - event.target.style.borderWidth;
-    const rect =  event.target.getBoundingClientRect();
-    const x = Math.round(event.pageX - rect.left);
-
-    const progress = Math.round(x / width * 100);
-
-    event.target.style.width = progress;
+    element.querySelector('.progress-bar').style.width = `${progress}%`;
+    element.querySelector('span').innerHTML = `${progress}&nbsp;<i class="fa-solid fa-percent text-gray-400"></i>`;
 }

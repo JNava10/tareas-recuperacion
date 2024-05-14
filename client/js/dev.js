@@ -1,7 +1,7 @@
 import * as taskApi from "../common/api/task.api.js";
 import {createElementFromString, getUserId} from "../common/services/common.service.js";
 import {colors} from "../common/consts.js";
-import {getAssignedTaskCard, getReleaseTaskButton} from "../common/elements/tasks.elements.js";
+import {getAssignedTaskCard, getReleaseTaskButton, getTaskProgressField} from "../common/elements/tasks.elements.js";
 import {showAlert} from "../common/services/message.service.js";
 import {buildNavbar} from "../common/services/navbar.service.js";
 
@@ -32,8 +32,8 @@ const buildAssignedTasksPanel = (tasks) => {
     const panel = document.querySelector('#taskList');
 
     tasks.forEach(task => {
-        const progressColor = calculateProgressColor(task.progress)
-        const taskCard = getAssignedTaskCard(task).element
+        const taskCard = getAssignedTaskCard(task).element;
+        const progressField = getTaskProgressField(task).element;
 
         const removeButton = getReleaseTaskButton().element;
 
@@ -47,6 +47,7 @@ const buildAssignedTasksPanel = (tasks) => {
         }
 
         taskCard.querySelector('.buttons').append(removeButton);
+        taskCard.querySelector('.progress-field').append(progressField);
 
         panel.append(taskCard);
     })
