@@ -31,16 +31,9 @@ onload = async () => {
 const buildAssignedTasksPanel = (tasks) => {
     const panel = document.querySelector('#taskList');
 
-
     tasks.forEach(task => {
         const progressColor = calculateProgressColor(task.progress)
         const taskCard = getAssignedTaskCard(task).element
-
-        // if (task.assigned_by.id !== userId) {
-        //     const removeButton = getReleaseTaskButton().element;
-        //
-        //     taskCard.querySelector('.buttons').append(removeButton);
-        // }
 
         const removeButton = getReleaseTaskButton().element;
 
@@ -66,3 +59,17 @@ const calculateProgressColor = (progress) => {
     else if (progress === 100) return colors.success;
     else if (progress > 75 && progress <= 100) return colors.primary;
 };
+
+const changeProgressValue = (event) => {
+    const width = event.target.offsetWidth - event.target.style.borderWidth;
+    const rect =  event.target.getBoundingClientRect();
+    const x = Math.round(event.pageX - rect.left);
+
+    const progress = Math.round(x / width * 100);
+
+    // if (progress === event.target.value) return;
+
+    event.target.value = progress;
+
+    console.log(progress)
+}
