@@ -1,8 +1,8 @@
-import {createElementFromString, getUserId} from "../../common/services/common.service.js";
-import * as taskApi from "../../common/api/task.api.js";
-import { getAssignedTaskCard, getUnassignedTaskCard} from "../../common/elements/tasks.elements.js";
-import {showAlert} from "../../common/services/message.service.js";
-import {colors} from "../../common/consts.js";
+import {createElementFromString, getUserId} from "../common/services/common.service.js";
+import * as taskApi from "../common/api/task.api.js";
+import { getAssignedTaskCard, getUnassignedTaskCard} from "../common/elements/tasks.elements.js";
+import {showAlert} from "../common/services/message.service.js";
+import {colors} from "../common/consts.js";
 
 const mainContainer = document.querySelector('.main.container');
 

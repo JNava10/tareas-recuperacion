@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Mockery\Exception;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
@@ -30,6 +31,34 @@ class UserController extends Controller
             return Common::sendStdResponse(
                 'Se han obtenido correctamente todos los usuarios.',
                 ['users' => $users]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function getUser(int $id) {
+        try {
+            $user = User::with('roles')->find($id);
+
+            if (!$user) {
+                return Common::sendStdResponse(
+                    'No existe ningun usuario coincidente.',
+                    [$user],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente el usuario.',
+                [$user]
             );
         } catch (Exception $exception)
         {
@@ -478,6 +507,68 @@ class UserController extends Controller
             return Common::sendStdResponse(
                 'Se han asignado los roles correctamente.',
                 ['executed' => true]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    public function changeProfilePic(int $userId, Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            ['fails' => $validate->failed(), 'request' =>  $request->all()],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        $file = $request->file('image');
+        $path = $file->store('profile_pìcs', 's3');
+        $url = Storage::disk('s3')->url($path);
+
+        if (!$url) return Common::sendStdResponse(
+            "Ha ocurrido un error al subir la imagen.",
+            [false],
+            SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+        );
+
+        $user = User::find($userId);
+        $user->pic_url = $url;
+        $user->save();
+
+        return Common::sendStdResponse(
+            'Se ha cambiado la foto de perfil correctamente.',
+            ['url' => $url]
+        );
+    }
+
+    function getUserRoles(int $id) {
+        try {
+            $user = User::with('roles')->find($id);
+
+            if (!$user) {
+                return Common::sendStdResponse(
+                    'No existe el usuario en el sistema.',
+                    ['users' => $user],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente todos los usuarios.',
+                ['roles' => $user->roles]
             );
         } catch (Exception $exception)
         {

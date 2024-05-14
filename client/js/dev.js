@@ -3,6 +3,7 @@ import {createElementFromString, getUserId} from "../common/services/common.serv
 import {colors} from "../common/consts.js";
 import {getAssignedTaskCard, getReleaseTaskButton} from "../common/elements/tasks.elements.js";
 import {showAlert} from "../common/services/message.service.js";
+import {buildNavbar} from "../common/services/navbar.service.js";
 
 const mainContainer = document.querySelector('.main.container');
 const userId = getUserId()
@@ -23,6 +24,7 @@ async function getAssignedTasks() {
 }
 
 onload = async () => {
+    await buildNavbar();
     await getAssignedTasks();
 }
 
