@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" class="has-background-dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar perfil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://kit.fontawesome.com/c48e0b1fd6.js" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+
+</head>
+<body>
+<header></header>
+<main>
+    <h3>Tu perfil</h3>
+
+    <div>
+        <div><img id="userProfilePic" data-dropdown-toggle="photoDropdown" class="w-36 h-36 rounded-full cursor-pointer"></div>
+        <span id="userFullname"></span>
+    </div>
+    <div></div>
+
+    <div id="photoDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="photoDropdown">
+            <li>
+                <button id="viewProfilePhoto" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Ver foto</button>
+            </li>
+            <li>
+                <button id="uploadProfilePhoto" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Subir una nueva foto</button>
+            </li>
+        </ul>
+    </div>
+</main>
+<footer></footer>
+<!--<script src="../../../dist/users.js"></script>-->
+<script type="module" src="../../js/edit-profile.js"></script>
+
+<script src="https://kit.fontawesome.com/c48e0b1fd6.js" crossorigin="anonymous"></script>
+
+</body>
+</html>

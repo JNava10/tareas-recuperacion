@@ -61,3 +61,14 @@ export const createUser = async (user) => {
 export const searchUsers = async (searchInput) => {
     return await Fetch.get('user', [searchInput],  false);
 };
+
+export const changeProfilePic = async (file) => {
+    const userId = getUserId();
+    const formData = new FormData();
+
+    formData.append('image', file);
+
+    console.log(formData.get('image'))
+
+    return await Fetch.postFormData(`user/profile_pic/${userId}`, formData, false);
+};

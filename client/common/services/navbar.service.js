@@ -44,7 +44,7 @@ export const buildNavbar = async () => {
             itemElement.querySelector('a').before(iconElement);
         }
 
-        if (item['publicPath']) itemElement.querySelector('a').href = item['publicPath'];
+        if (item['publicPath']) itemElement.querySelector('a').href = `${hostPath}/${item['publicPath']}`;
 
         profileDropdownList.append(itemElement);
     })
