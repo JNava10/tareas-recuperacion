@@ -1,7 +1,7 @@
 import * as taskApi from "../common/api/task.api.js";
 import {createElementFromString, getUserId} from "../common/services/common.service.js";
 import {colors} from "../common/consts.js";
-import {getAssignedTaskCard, getReleaseTaskButton} from "../common/elements/tasks.elements.js";
+import {getAssignedTaskCard, getReleaseTaskButton, getTaskProgressField} from "../common/elements/tasks.elements.js";
 import {showAlert} from "../common/services/message.service.js";
 import {buildNavbar} from "../common/services/navbar.service.js";
 
@@ -31,16 +31,9 @@ onload = async () => {
 const buildAssignedTasksPanel = (tasks) => {
     const panel = document.querySelector('#taskList');
 
-
     tasks.forEach(task => {
-        const progressColor = calculateProgressColor(task.progress)
-        const taskCard = getAssignedTaskCard(task).element
-
-        // if (task.assigned_by.id !== userId) {
-        //     const removeButton = getReleaseTaskButton().element;
-        //
-        //     taskCard.querySelector('.buttons').append(removeButton);
-        // }
+        const taskCard = getAssignedTaskCard(task).element;
+        const progressField = getTaskProgressField(task).element;
 
         const removeButton = getReleaseTaskButton().element;
 
@@ -54,6 +47,7 @@ const buildAssignedTasksPanel = (tasks) => {
         }
 
         taskCard.querySelector('.buttons').append(removeButton);
+        taskCard.querySelector('.progress-field').append(progressField);
 
         panel.append(taskCard);
     })
@@ -66,3 +60,17 @@ const calculateProgressColor = (progress) => {
     else if (progress === 100) return colors.success;
     else if (progress > 75 && progress <= 100) return colors.primary;
 };
+
+const changeProgressValue = (event) => {
+    const width = event.target.offsetWidth - event.target.style.borderWidth;
+    const rect =  event.target.getBoundingClientRect();
+    const x = Math.round(event.pageX - rect.left);
+
+    const progress = Math.round(x / width * 100);
+
+    // if (progress === event.target.value) return;
+
+    event.target.value = progress;
+
+    console.log(progress)
+}

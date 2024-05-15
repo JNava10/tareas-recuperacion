@@ -32,6 +32,10 @@ export const editTask = async (editedTask, id) => {
     return await Fetch.put('task', editedTask, [id], false);
 };
 
+export const changeTaskProgress = async (taskId, progress) => {
+    return await Fetch.put('task/progress', {progress}, [taskId], false);
+};
+
 export const getAllTasks = async () => {
     return await Fetch.get('task', [], false);
 };

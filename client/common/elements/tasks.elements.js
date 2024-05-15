@@ -1,5 +1,6 @@
 import {getLargeBadge} from "../flowbite/badge.js";
 import {createElementFromString} from "../services/common.service.js";
+import * as taskApi from "../api/task.api.js";
 
 export const getUnassignedTaskCard = (task) => {
     const cardHtml =
@@ -43,10 +44,10 @@ export const getAssignedTaskCard = (task) => {
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${task.name}</h5>
                     <p class="font-normal text-gray-700 dark:text-gray-400">${task.description}</p>
                 </div>
-            </div>
-            <div>
-                ${getLargeBadge(task.difficulty.name, 'gray').html}
-            </div>
+                </div>
+                <div>
+                    ${getLargeBadge(task.difficulty.name, 'gray').html}
+                </div>
             </div>
             <div class="flex assignedBy">
                 <div class="flex align-items-center justify-content-between mt-4">
@@ -54,6 +55,7 @@ export const getAssignedTaskCard = (task) => {
                     <span>${task.assigned_by.name} ${task.assigned_by.first_lastname} ${task.assigned_by.second_lastname}</span>
                 </div>
             </div>
+            <div class="field progress-field"></div>
             <div class="buttons"></div>
         </div>`
 
@@ -73,3 +75,45 @@ export const getReleaseTaskButton = () => {
     }
 }
 
+export const getTaskProgressField  = (task) => {
+    const html =
+        `<div>
+            <span class="bg-gray-100 mb-3 text-gray-400 text-sm font-medium me-2 px-2 py-0.5 rounded dark:bg-gray-700 dark:text-gray-400">
+                ${task.progress}
+                <i class="fa-solid fa-percent text-gray-400"></i>
+            </span>
+            <div class="w-full mt-2 bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 grid">
+                 <div class="relative">
+                    <div class="absolute z-10 bg-blue-600 h-2.5 rounded-full progress-bar" style="width: ${task.progress}%"></div>
+                    <input id="minmax-range" type="range" min="1" max="99" value="${task.progress}" class="absolute bg-transparent z-20 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-700">
+                 </div>
+            </div>
+        </div>`;
+
+    const element =  createElementFromString(html);
+
+    element.querySelector('input').oninput = (event) => {
+        const progress = event.target.value;
+
+        changeProgressValue(event, element);
+    };
+
+    let timeout;
+
+    element.querySelector('input').onmouseup = (event) => {
+        const progress = event.target.value;
+
+        clearTimeout(timeout);
+
+        timeout = setTimeout(() => taskApi.changeTaskProgress(task.id, progress), 400);
+    };
+
+    return {html, element}
+}
+
+const changeProgressValue = (event, element) => {
+    const progress = event.target.value;
+
+    element.querySelector('.progress-bar').style.width = `${progress}%`;
+    element.querySelector('span').innerHTML = `${progress}&nbsp;<i class="fa-solid fa-percent text-gray-400"></i>`;
+}

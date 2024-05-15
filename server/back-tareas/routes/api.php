@@ -48,6 +48,7 @@ Route::prefix('/task')->group(function () {
     Route::get('/difficulties', [TaskController::class, 'getAllDifficulties']);
     Route::delete('/{id}', [TaskController::class, 'deleteTask']);
     Route::put('/{id}', [TaskController::class, 'editTask']);
+    Route::put('/progress/{id}', [TaskController::class, 'changeTaskProgress']);
     Route::post('/', [TaskController::class, 'createTask']);
     Route::post('/assign/{id}', [TaskController::class, 'assignTask']);
     Route::post('/unassign/{id}', [TaskController::class, 'unassignTask']);
