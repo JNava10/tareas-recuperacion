@@ -58,4 +58,6 @@ Route::prefix('/task')->group(function () {
     Route::get('/realized/{id}', [TaskController::class, 'getRealizedTasks']);
     Route::get('/available', [TaskController::class, 'getAvailableTasks']);
     Route::get('/available', [TaskController::class, 'getAvailableTasks']);
+
+    Route::get('/affine', [TaskController::class, 'getMostAffineUser']);
 });

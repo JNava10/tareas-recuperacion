@@ -6,6 +6,7 @@ use App\helpers\Common;
 use App\Models\Difficulty;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Mockery\Exception;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
@@ -400,4 +401,48 @@ class TaskController extends Controller
         }
     }
 
+    function getMostAffineUser(Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'difficulty' => 'required|string|max:100',
+                'scheduledHours' => 'required|integer|max:100',
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            [false],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        try {
+            $maxHours = round($request->scheduledHours * 1.15);
+            $minHours = round($request->scheduledHours * 0.85);
+
+            $user = DB::table('users')
+                ->join('tasks', 'users.id', '=', 'tasks.assigned_to')
+                ->where('tasks.progress', '=', 100)
+                ->whereBetween('tasks.scheduled_hours', [$minHours, $maxHours])
+                ->get('users.*');
+
+            if (!$user->isEmpty())
+                return Common::sendStdResponse(
+                'Se ha encontrado un usuario afín.',
+                ['user' => $user[0]]);
+            else
+                return Common::sendStdResponse(
+                'No se ha encontrado ningún usuario afín.',
+                ['user' => $user]);
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
