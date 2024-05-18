@@ -33,6 +33,7 @@ Route::prefix('/user')->group(function () {
     Route::get('/search/{searchInput}', [UserController::class, 'searchUser']);
 
     Route::put('/roles/{id}', [UserController::class, 'updateUserRoles']);
+    Route::post('/register', [UserController::class, 'createUser']);
 });
 
 Route::prefix('/role')->group(function () {

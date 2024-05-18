@@ -423,15 +423,16 @@ class UserController extends Controller
             $saved = $user->save();
             $userId = User::where('email', $request->email)->first()->id;
 
+            if ($request->roles) {
+                foreach ($request->roles as $roleId) {
+                    $assignedRole = new AssignedRoles();
 
-            foreach ($request->roles as $roleId) {
-                $assignedRole = new AssignedRoles();
-
-                $assignedRole->user_id = $userId;
-                $assignedRole->role_id = $roleId;
-                $assignedRole->created_at = now();
-                $assignedRole->updated_at = now();
-                $assignedRole->save();
+                    $assignedRole->user_id = $userId;
+                    $assignedRole->role_id = $roleId;
+                    $assignedRole->created_at = now();
+                    $assignedRole->updated_at = now();
+                    $assignedRole->save();
+                }
             }
 
             return Common::sendStdResponse(

@@ -12,7 +12,6 @@ async function getAvailableTasks() {
     const data = await taskApi.getAvailableTasks();
     tasks = [];
 
-
     if (data.tasks.length === 0) {
         const noTasksHtml = `<div><span>No hay mas tareas disponibles por el momento</span></div>`;
         const noTasksElement = createElementFromString(noTasksHtml);
