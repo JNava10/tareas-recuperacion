@@ -37,8 +37,13 @@ export const changeTaskProgress = async (taskId, progress) => {
 };
 
 export const getAllTasks = async () => {
-    return await Fetch.get('task', [], false);
+    return await Fetch.get('task', false);
 };
+
+export const getAllTasksWithAssignedBy = async () => {
+    return await Fetch.get('task/with-assigned-by', false);
+};
+
 
 export const getAllDifficulties = async () => {
     return await Fetch.get('task/difficulties', [], false);

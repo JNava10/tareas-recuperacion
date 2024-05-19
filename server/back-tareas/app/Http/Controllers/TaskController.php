@@ -40,6 +40,34 @@ class TaskController extends Controller
         }
     }
 
+    function getAllWithAssignedBy() {
+        try {
+            $tasks = Task::with(['difficulty', 'assignedBy'])->get();
+
+            if ($tasks->isEmpty()) {
+                return Common::sendStdResponse(
+                    'No hay ninguna tarea en el sistema.',
+                    ['tasks' => $tasks],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente todas las tareas.',
+                ['tasks' => $tasks]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     function getAvailableTasks(Request $request) {
         try {
             $tasks = Task::with('difficulty')
