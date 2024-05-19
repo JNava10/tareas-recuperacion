@@ -28,6 +28,7 @@ export const signOut = async () => {
     return await Fetch.post('auth/sign-out', [userId], false);
 };
 
+
 /**
  *
  * @param {EditedUser} editedUser
@@ -71,4 +72,8 @@ export const changeProfilePic = async (file) => {
     console.log(formData.get('image'))
 
     return await Fetch.postFormData(`user/profile_pic/${userId}`, formData, false);
+};
+
+export const registerUser = async (user) => {
+    return await Fetch.post('user/register', user,  false);
 };
