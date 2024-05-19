@@ -9,9 +9,5 @@ export const changeProgressValue = (event) => {
 
     const progress = Math.round(x / width * 100);
 
-    // if (progress === event.target.value) return;
-
     event.target.value = progress;
-
-    console.log(progress)
 }

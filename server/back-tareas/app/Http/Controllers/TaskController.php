@@ -354,4 +354,50 @@ class TaskController extends Controller
             );
         }
     }
+
+    function changeTaskProgress(int $id, Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'progress' => 'required|integer|min:0|max:100',
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            [false],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        try {
+            $task = Task::find($id);
+
+            if (!$task) {
+                return Common::sendStdResponse(
+                    'No hay ninguna tarea disponible.',
+                    ['task' => $task],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            $task->progress = $request->progress;
+
+            $task->save();
+
+            return Common::sendStdResponse(
+                'Se ha editado el progreso de la tarea correctamente.',
+                ['task' => $task]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
 }
