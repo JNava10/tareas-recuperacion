@@ -40,8 +40,8 @@ export const getAllTasks = async () => {
     return await Fetch.get('task', false);
 };
 
-export const getAllTasksWithAssignedBy = async () => {
-    return await Fetch.get('task/with-assigned-by', false);
+export const getAllTasksWithAssignedTo = async () => {
+    return await Fetch.get('task/with-assigned-to', false);
 };
 
 

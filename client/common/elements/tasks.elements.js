@@ -117,3 +117,33 @@ const changeProgressValue = (event, element) => {
     element.querySelector('.progress-bar').style.width = `${progress}%`;
     element.querySelector('span').innerHTML = `${progress}&nbsp;<i class="fa-solid fa-percent text-gray-400"></i>`;
 }
+
+export const getProjectTaskCard = (task) => {
+    const cardHtml =
+        `<div class="max-w-sm p-5 bg-gray-100 border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex">
+                <div class="w-4/5 mr-2">
+                <div>
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${task.name}</h5>
+                    <p class="font-normal text-gray-700 dark:text-gray-400">${task.description}</p>
+                </div>
+                </div>
+                <div>
+                    ${getLargeBadge(task.difficulty.name, 'gray').html}
+                </div>
+            </div>
+            <div class="flex assignedTo">
+                <div class="flex align-items-center justify-content-between mt-4">
+                    <img class="w-10 h-10 rounded-full mr-2" src="${task.user_assigned.pic_url}">
+                    <span>${task.user_assigned.name} ${task.user_assigned.first_lastname} ${task.user_assigned.second_lastname}</span>
+                </div>
+            </div>
+            <div class="field progress-field"></div>
+            <div class="buttons"></div>
+        </div>`
+
+    return {
+        html: cardHtml,
+        element: createElementFromString(cardHtml)
+    }
+}

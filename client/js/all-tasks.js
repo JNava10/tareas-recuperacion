@@ -1,6 +1,6 @@
 import * as taskApi from "../common/api/task.api.js";
-import {getAllTasks, getAllTasksWithAssignedBy} from "../common/api/task.api.js";
-import {getAssignedTaskCard, getUnassignedTaskCard} from "../common/elements/tasks.elements.js";
+import {getAllTasks, getAllTasksWithAssignedTo} from "../common/api/task.api.js";
+import {getAssignedTaskCard, getProjectTaskCard, getUnassignedTaskCard} from "../common/elements/tasks.elements.js";
 
 const taskList = document.querySelector('#taskList');
 const showOnlyAssignedToggle = document.querySelector('#showOnlyAssigned');
@@ -9,34 +9,36 @@ let tasks = [];
 let showingTasks = [];
 
 onload = async () => {
+    const data = await getAllTasksWithAssignedTo();
 
-    await showAllTasks();
+    console.log(data)
 
-    const {difficulties} = await taskApi.getAllDifficulties();
+    tasks = data.tasks
+
+    console.log(tasks)
+
+    showAllTasks()
 }
 
 const clearTasks = () => {
     taskList.innerHTML = "";
-    tasks = [];
+    showingTasks = [];
 };
 
 function showTasks() {
     showingTasks.forEach(task => {
         let taskElement;
 
-        if (!task.assigned_by) taskElement = getUnassignedTaskCard(task).element;
-        else taskElement = getAssignedTaskCard(task).element;
+        if (!task.assigned_to) taskElement = getUnassignedTaskCard(task).element;
+        else taskElement = getProjectTaskCard(task).element;
 
         taskList.append(taskElement);
     });
 }
 
-const showAllTasks = async () => {
+const showAllTasks = () => {
     if (tasks.length > 0) clearTasks();
 
-    const data = await getAllTasksWithAssignedBy();
-
-    tasks = data.tasks;
     showingTasks = tasks;
 
     showTasks();
@@ -44,13 +46,19 @@ const showAllTasks = async () => {
 
 const filterOnlyAssigned = () => {
     clearTasks();
-    showingTasks = tasks.find(task => task.assignedBy);
+
+    showingTasks = tasks.filter(task => task.assigned_to != null);
+
+    console.log(tasks)
+
+    showTasks();
 }
 
 const toggleAssignedTasks = () => (event) => {
     const isChecked = event.target.checked;
 
     if (isChecked) filterOnlyAssigned()
+    else showAllTasks()
 };
 
 showOnlyAssignedToggle.onchange = toggleAssignedTasks();
