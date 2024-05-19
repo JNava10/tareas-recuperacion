@@ -7,6 +7,7 @@ export const editUserRoles = async (user) => {
     return await Fetch.put('user/roles', {roles},[id], false);
 };
 
+
 export const getUserRoles = async () => {
     return await Fetch.get('user/roles', [], false);
 };
@@ -47,4 +48,8 @@ export const createUser = async (user) => {
 
 export const searchUsers = async (searchInput) => {
     return await Fetch.get('user', [searchInput],  false);
+};
+
+export const registerUser = async (user) => {
+    return await Fetch.post('user/register', user,  false);
 };

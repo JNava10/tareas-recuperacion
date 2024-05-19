@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\helpers\Common;
 use App\Models\AssignedRoles;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -391,11 +392,11 @@ class UserController extends Controller
                 [
                     'name' => 'required|string|max:255',
                     'email' => 'required|string|max:255',
-                    'first_lastname' => 'required|string|max:255',
-                    'second_lastname' => 'required|string|max:255',
+                    'firstLastname' => 'required|string|max:255',
+                    'secondLastname' => 'required|string|max:255',
                     'password' => 'required|string|max:255',
                     'roles' => 'array',
-                    'roles.*' => 'integer|required|max:255'
+                    'roles.*' => 'string|required|max:255'
                 ]
             );
 
@@ -416,15 +417,17 @@ class UserController extends Controller
 
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->first_lastname = $request->first_lastname;
-            $user->second_lastname = $request->second_lastname;
+            $user->first_lastname = $request->firstLastname;
+            $user->second_lastname = $request->secondLastname;
             $user->password = Hash::make($request->password);
 
             $saved = $user->save();
             $userId = User::where('email', $request->email)->first()->id;
 
             if ($request->roles) {
-                foreach ($request->roles as $roleId) {
+                foreach ($request->roles as $roleName) {
+                    $roleId = Role::where('name', $roleName)->first()->id;
+
                     $assignedRole = new AssignedRoles();
 
                     $assignedRole->user_id = $userId;
