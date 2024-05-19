@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Mockery\Exception;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
 
@@ -259,10 +260,11 @@ class UserController extends Controller
         $validate = Validator::make(
             $request->all(),
             [
-                'id' => 'required|string|max:255',
+                'id' => 'required|int|max:255',
                 'name' => 'string|max:255',
-                'firstSurname' => 'string|max:255',
-                'secondSurname' => 'string|max:255',
+                'email' => 'email|max:255',
+                'first_lastname' => 'string|max:255',
+                'second_lastname' => 'string|max:255',
             ]
         );
 
@@ -276,8 +278,9 @@ class UserController extends Controller
             $user = User::find($request->id);
 
             if ($request->name) $user->name = $request->name;
-            elseif ($request->firstLastname) $user->first_lastname = $request->firstLastname;
-            elseif ($request->secondLastname) $user->second_lastname = $request->secondSurname;
+            elseif ($request->first_lastname) $user->first_lastname = $request->first_lastname;
+            elseif ($request->second_lastname) $user->second_lastname = $request->second_lastname;
+            elseif ($request->email) $user->email = $request->email;
             else return Common::sendStdResponse(
                 'No se ha indicado ningun campo que actualizar.',
                 ['executed' => false]

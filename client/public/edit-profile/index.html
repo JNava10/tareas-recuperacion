@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="has-background-dark">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <title>Editar perfil</title>
@@ -15,22 +15,56 @@
 <main>
     <h3>Tu perfil</h3>
 
-    <div>
-        <div><img id="userProfilePic" data-dropdown-toggle="photoDropdown" class="w-36 h-36 rounded-full cursor-pointer"></div>
-        <span id="userFullname"></span>
-    </div>
-    <div></div>
-
-    <div id="photoDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="photoDropdown">
-            <li>
-                <button id="viewProfilePhoto" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Ver foto</button>
-            </li>
-            <li>
-                <button id="uploadProfilePhoto" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Subir una nueva foto</button>
-            </li>
-        </ul>
-    </div>
+   <div class="flex gap-6 justify-center items-center">
+       <div>
+           <div><img id="userProfilePic" data-dropdown-toggle="photoDropdown" class="w-36 h-36 rounded-full cursor-pointer"></div>
+           <span id="userFullname"></span>
+       </div>
+       <div id="photoDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+           <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="photoDropdown">
+               <li>
+                   <button id="viewProfilePhoto" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Ver foto</button>
+               </li>
+               <li>
+                   <button id="uploadProfilePhoto" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Subir una nueva foto</button>
+               </li>
+           </ul>
+       </div>
+       <form class="max-w-sm" novalidate>
+           <h3 class="text-3xl text-gray-900 font-bold dark:text-white">Editar datos</h3>
+           <div class="mb-5">
+               <label for="editEmail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+               <div class="flex justify-between gap-1 items-center">
+                   <input type="email" field="email" id="editEmail" class="m-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                   <span for="editEmail" class="validation"></span>
+               </div>
+           </div>
+           <div class="mb-5">
+               <label for="editName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
+               <div class="flex justify-between gap-1 items-center">
+                   <input type="text" field="name" id="editName" class="m-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                   <span for="editName" class="validation"></span>
+               </div>
+           </div>
+           <div class="flex justify-between gap-3 mb-5">
+               <div>
+                   <label for="editfirstLastname" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Primer apellido</label>
+                   <div class="flex justify-between gap-1 items-center">
+                       <input type="text" field="first_lastname" id="editFirstLastname" class="m-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                       <span for="editFirstLastname" class="validation"></span>
+                   </div>
+               </div>
+               <div>
+                   <label for="editSecondLastname" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Segundo apellido</label>
+                   <div class="flex justify-between gap-1 items-center">
+                       <input type="text" field="second_lastname"  id="editSecondLastname" class="m-0 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                       <span for="editSecondLastname" class="validation"></span>
+                   </div>
+               </div>
+           </div>
+           <button id="submitEditUser" type="submit">Guardar cambios</button>
+       </form>
+   </div>
 </main>
 <footer></footer>
 <!--<script src="../../../dist/users.js"></script>-->
