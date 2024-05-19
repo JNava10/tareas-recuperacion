@@ -2,9 +2,15 @@ import {getSelfData} from "../common/api/user.api.js";
 import {showAlert} from "../common/services/message.service.js";
 import {colors} from "../common/consts.js";
 import * as userApi from "../common/api/user.api.js";
+import {regex} from "../common/regex.js";
+import {setValidationIcon} from "../common/services/common.service.js";
+const invalidIconHtml = `<i class="fa-solid fa-ban"></i>`;
+
+const submitEditBtn = document.querySelector('#submitEditUser');
+let user = {}
 
 async function getUserData() {
-    const user = (await getSelfData())[0];
+    user = (await getSelfData())[0];
 
     handleUserData(user)
 }
@@ -13,10 +19,18 @@ onload = async () => {
     await getUserData();
 }
 
+
 const handleUserData = (user) => {
+    // Foto de perfil
     document.querySelector('#userProfilePic').src = user.pic_url;
     document.querySelector('#uploadProfilePhoto').onclick = () => showUploadInput()
+
+    // Datos del perfil
+    const userFields = document.querySelectorAll('input[field]');
+
+    userFields.forEach(field => setUserData(field, user))
 };
+
 
 const showUploadInput = () => {
     const tempInput = document.createElement('input');
@@ -48,3 +62,63 @@ const handleFile = async (file) => {
 
     await getUserData()
 };
+
+const setUserData = (field, user) => {
+    const fieldName = field.getAttribute('field');
+
+    if (!fieldName) return;
+
+    field.value = user[fieldName];
+};
+
+const submitEditProfile = async (event) => {
+    event.preventDefault();
+
+    const userFields = document.querySelectorAll('input[field]');
+    const editedUser = {};
+    const validations = [];
+
+    userFields.forEach(field => {
+        const fieldName = field.getAttribute('field');
+
+        if (!fieldName) return;
+
+        const isValid = validateField(field);
+
+        setValidationIcon(field, isValid)
+
+        validations.push(isValid);
+
+        editedUser[fieldName] = field.value;
+    });
+
+    const allFieldsValid = validations.every(validation => validation === true);
+
+    if (!allFieldsValid) {
+        showAlert(`Revisa de nuevo los campos marcados con ${invalidIconHtml}`, colors.danger)
+        return;
+    }
+
+    editedUser.id = user.id;
+
+    const {message, data} = await userApi.editUser(editedUser);
+
+    const alertColor = data.executed ? colors.success : colors.danger;
+
+    showAlert(message, alertColor);
+};
+
+const validateField = (field) => {
+    const fieldName = field.getAttribute('field');
+
+    const formRegex = {
+        email: regex.email,
+        name: regex.commonTextField,
+        first_lastname: regex.commonTextField,
+        second_lastname: regex.commonTextField
+    };
+
+    return formRegex[fieldName].test(field.value);
+};
+
+submitEditBtn.onclick = (event) => submitEditProfile(event)

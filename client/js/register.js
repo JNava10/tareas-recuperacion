@@ -5,9 +5,10 @@ import * as userApi from "../common/api/user.api.js";
 import {colors} from "../common/consts.js";
 
 // Elementos del DOM
-const submitBtn = document.querySelector('button[type=submit]');
 const validIconHtml = `<i class="fa-solid fa-check"></i>`;
 const invalidIconHtml = `<i class="fa-solid fa-ban"></i>`;
+
+const submitBtn = document.querySelector('button[type=submit]');
 
 // Eventos
 submitBtn.onclick = (event) => submitRegister(event)
@@ -46,8 +47,8 @@ const validateFields = (fields) => {
             const passwordsValid = validatePasswords()
             isValid = isValid && passwordsValid;
         }
-        const validationElement = document.querySelector(`.validation[for=${field.id}]`);
 
+        const validationElement = document.querySelector(`.validation[for=${field.id}]`);
 
         if (!validationElement) return;
 
@@ -56,7 +57,7 @@ const validateFields = (fields) => {
         const iconHtml = isValid ? validIconHtml : invalidIconHtml;
         const iconElement = createElementFromString(iconHtml);
 
-        validationElement.append(iconElement)
+        validationElement.append(iconElement);
 
         validations.push(isValid);
     });
