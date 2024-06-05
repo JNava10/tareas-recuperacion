@@ -93,7 +93,6 @@ export class Fetch {
         }
 
         let body;
-
         try {
             let response = await fetch(url, options);
 
@@ -141,8 +140,6 @@ export class Fetch {
         }
 
         try {
-            console.log(options);
-            console.log(args)
             const response = await fetch(url, options);
             const body = await response.json();
 

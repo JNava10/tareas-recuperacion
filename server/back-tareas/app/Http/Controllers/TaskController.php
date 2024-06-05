@@ -167,7 +167,13 @@ class TaskController extends Controller
                 );
             }
 
-            if ($task->user()) $task->user()->delete();
+            if ($task->userAssigned()) {
+                $task->userAssigned()->delete();
+            }
+
+            if ($task->assignedBy()) {
+                $task->assignedBy()->delete();
+            }
 
             $deleted = $task->delete();
 
