@@ -3,10 +3,16 @@ import * as taskApi from "../common/api/task.api.js";
 import { getAssignedTaskCard, getUnassignedTaskCard} from "../common/elements/tasks.elements.js";
 import {showAlert} from "../common/services/message.service.js";
 import {colors} from "../common/consts.js";
+import {buildNavbar} from "../common/services/navbar.service.js";
 
 const mainContainer = document.querySelector('.main.container');
 
 let tasks = [];
+
+onload = async () => {
+    await buildNavbar();
+    await getAvailableTasks();
+}
 
 async function getAvailableTasks() {
     const data = await taskApi.getAvailableTasks();
@@ -22,10 +28,6 @@ async function getAvailableTasks() {
 
         buildAvailableTasksPanel(tasks)
     }
-}
-
-onload = async () => {
-    await getAvailableTasks();
 }
 
 const buildAvailableTasksPanel = (tasks) => {

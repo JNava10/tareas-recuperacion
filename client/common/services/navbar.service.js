@@ -1,10 +1,11 @@
-import * as storageService from "./storage.service.js";
 import {createElementFromString, getUserId} from "./common.service.js";
 import {hostPath} from "../consts.js";
 import {getSelfData, signOut} from "../api/user.api.js";
 
 export const buildNavbar = async () => {
     const navbarItemList = document.querySelector('.navbarItems');
+
+    console.log(document.querySelector('.profileImg'))
 
     const {roles, pic_url} = (await getSelfData())[0];
 

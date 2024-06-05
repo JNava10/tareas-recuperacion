@@ -7,6 +7,7 @@ import {showAlert} from "../common/services/message.service.js";
 import {changeProgressValue} from "../common/services/input.service.js"
 import * as userApi from "../common/api/user.api.js";
 import {createUserList, createUserListItem} from "../common/services/flowbite.service.js";
+import {buildNavbar} from "../common/services/navbar.service.js";
 
 let tasks = [];
 let users = [];
@@ -19,6 +20,7 @@ let difficultySelect;
 let timeout;
 
 onload = async () => {
+    await buildNavbar();
     await showAllTasks();
 
     const {difficulties} = await taskApi.getAllDifficulties();

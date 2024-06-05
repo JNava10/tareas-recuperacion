@@ -10,6 +10,7 @@ import {regex} from "../common/regex.js";
 import {PasswordEdited} from "../common/class/user/req/passwordEdited.js";
 import {open} from "../common/elements/context_menu/contextMenu.js";
 import {getUserFieldMenu} from "../common/elements/context_menu/userFieldMenu.js";
+import {buildNavbar} from "../common/services/navbar.service.js";
 
 const usersTableBody = document.querySelector('#usersTable tbody');
 const usersTableHeaders = document.querySelectorAll('#usersTable th');
@@ -42,6 +43,7 @@ let users = [];
 let roles = [];
 
 onload = async () => {
+    await buildNavbar();
     const data = await getAllUsers();
 
     users = data.users;

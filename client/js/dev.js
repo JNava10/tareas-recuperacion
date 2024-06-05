@@ -8,6 +8,10 @@ import {buildNavbar} from "../common/services/navbar.service.js";
 const mainContainer = document.querySelector('.main.container');
 const userId = getUserId()
 
+onload = async () => {
+    await buildNavbar();
+    await getAssignedTasks();
+}
 async function getAssignedTasks() {
     const panel = document.querySelector('#taskList');
 
@@ -21,11 +25,6 @@ async function getAssignedTasks() {
 
         mainContainer.append(noTasksElement);
     } else buildAssignedTasksPanel(tasks)
-}
-
-onload = async () => {
-    await buildNavbar();
-    await getAssignedTasks();
 }
 
 const buildAssignedTasksPanel = (tasks) => {
