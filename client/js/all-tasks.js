@@ -1,6 +1,7 @@
-import * as taskApi from "../common/api/task.api.js";
+
 import {getAllTasks, getAllTasksWithAssignedTo} from "../common/api/task.api.js";
 import {getAssignedTaskCard, getProjectTaskCard, getUnassignedTaskCard} from "../common/elements/tasks.elements.js";
+import {buildNavbar} from "../common/services/navbar.service.js";
 
 const taskList = document.querySelector('#taskList');
 const showOnlyAssignedToggle = document.querySelector('#showOnlyAssigned');
@@ -9,13 +10,11 @@ let tasks = [];
 let showingTasks = [];
 
 onload = async () => {
+    console.log(document.querySelector('.profileImg'))
+    await buildNavbar();
     const data = await getAllTasksWithAssignedTo();
 
-    console.log(data)
-
     tasks = data.tasks
-
-    console.log(tasks)
 
     showAllTasks()
 }

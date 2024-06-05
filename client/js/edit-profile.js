@@ -4,6 +4,7 @@ import {colors} from "../common/consts.js";
 import * as userApi from "../common/api/user.api.js";
 import {regex} from "../common/regex.js";
 import {setValidationIcon} from "../common/services/common.service.js";
+import {buildNavbar} from "../common/services/navbar.service.js";
 const invalidIconHtml = `<i class="fa-solid fa-ban"></i>`;
 
 const submitEditBtn = document.querySelector('#submitEditUser');
@@ -16,9 +17,9 @@ async function getUserData() {
 }
 
 onload = async () => {
+    await buildNavbar();
     await getUserData();
 }
-
 
 const handleUserData = (user) => {
     // Foto de perfil
@@ -30,7 +31,6 @@ const handleUserData = (user) => {
 
     userFields.forEach(field => setUserData(field, user))
 };
-
 
 const showUploadInput = () => {
     const tempInput = document.createElement('input');

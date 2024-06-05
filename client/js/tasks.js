@@ -7,6 +7,7 @@ import {showAlert} from "../common/services/message.service.js";
 import {changeProgressValue} from "../common/services/input.service.js"
 import * as userApi from "../common/api/user.api.js";
 import {createUserList, createUserListItem} from "../common/services/flowbite.service.js";
+import {buildNavbar} from "../common/services/navbar.service.js";
 
 let tasks = [];
 let users = [];
@@ -17,6 +18,33 @@ const mainContainer = document.querySelector('#mainContainer');
 
 let difficultySelect;
 let timeout;
+
+onload = async () => {
+    await buildNavbar();
+    await showAllTasks();
+
+    const {difficulties} = await taskApi.getAllDifficulties();
+    const userData = await userApi.getAllUsers();
+
+    users = userData.users;
+
+    let options = "";
+
+    difficulties.forEach(difficulty => {
+        difficultyList.set(difficulty.name, difficulty);
+        options = options.concat(`<option value="${difficulty.id}">${difficulty.name}</option>`)
+    });
+
+    const diffSelectHtml = `<div class="select">
+        <select field="diffId">${options}</select>
+    </div>`
+
+    difficultySelect = createElementFromString(diffSelectHtml);
+
+    const createButton = buildCreateButton();
+
+    mainContainer.append(createButton);
+}
 
 async function showAllTasks() {
     if (tasks.length > 0) {
@@ -60,7 +88,7 @@ const buildCreateButton = () => {
             <div class="field">
               <label class="label">Horas planeadas</label>
               <div class="control">
-                <input class="input" type="text" field="scheduledHours">
+                <input class="input" type="number" field="scheduledHours">
               </div>
             </div>
             <div class="field">
@@ -111,32 +139,6 @@ const buildCreateButton = () => {
 
     return buttonElement;
 };
-
-onload = async () => {
-    await showAllTasks();
-
-    const {difficulties} = await taskApi.getAllDifficulties();
-    const userData = await userApi.getAllUsers();
-
-    users = userData.users;
-
-    let options = "";
-
-    difficulties.forEach(difficulty => {
-        difficultyList.set(difficulty.name, difficulty);
-        options = options.concat(`<option value="${difficulty.id}">${difficulty.name}</option>`)
-    });
-
-    const diffSelectHtml = `<div class="select">
-        <select field="diffId">${options}</select>
-    </div>`
-
-    difficultySelect = createElementFromString(diffSelectHtml);
-
-    const createButton = buildCreateButton();
-
-    mainContainer.append(createButton);
-}
 
 
 function onClickCard(event, task) {
@@ -295,6 +297,8 @@ const createTaskElement = (task) => {
                 const {message, data} = await taskApi.assignTask(task.id, user.id);
 
                 closeModal(searchModal);
+
+                console.log(message)
 
                 if (data.executed) showAlert(message);
                 else showAlert(message, colors.danger);
