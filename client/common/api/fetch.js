@@ -36,6 +36,35 @@ export class Fetch {
         }
     }
 
+    static async postFormData(route, formData, sendToken = true) {
+        let url = `${CONSTANTS.API_URL}/${route}`
+
+        const options = {
+            "method": CONSTANTS.REST_METHODS.POST,
+            "headers": {},
+            "body": formData
+        };
+
+        if (sendToken === true) {
+            const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+
+            if (!token) return false;
+
+            options.headers["Authorization"] = `Bearer ${token}`
+        }
+
+        try {
+            const response = await fetch(url, options);
+
+            // if (response.status === 403) Common.redirectTo('public/login');
+            return await response.json();
+        } catch (error) {
+            console.log(error)
+
+            return false;
+        }
+    }
+
     static async get(route, args, sendToken = true) {
         let uri = String(route);
 
@@ -64,7 +93,6 @@ export class Fetch {
         }
 
         let body;
-
         try {
             let response = await fetch(url, options);
 
@@ -112,8 +140,6 @@ export class Fetch {
         }
 
         try {
-            console.log(options);
-            console.log(args)
             const response = await fetch(url, options);
             const body = await response.json();
 

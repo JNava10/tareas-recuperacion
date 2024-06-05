@@ -39,6 +39,93 @@ class TaskController extends Controller
             );
         }
     }
+
+    function getAllWithAssignedBy() {
+        try {
+            $tasks = Task::with(['difficulty', 'assignedBy'])->get();
+
+            if ($tasks->isEmpty()) {
+                return Common::sendStdResponse(
+                    'No hay ninguna tarea en el sistema.',
+                    ['tasks' => $tasks],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente todas las tareas.',
+                ['tasks' => $tasks]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function getAllWithAssignedTo() {
+        try {
+            $tasks = Task::with(['difficulty', 'userAssigned'])->get();
+
+            if ($tasks->isEmpty()) {
+                return Common::sendStdResponse(
+                    'No hay ninguna tarea en el sistema.',
+                    ['tasks' => $tasks],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente todas las tareas.',
+                ['tasks' => $tasks]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function getAvailableTasks(Request $request) {
+        try {
+            $tasks = Task::with('difficulty')
+                ->whereNull(['assigned_to', 'assigned_by'])
+                ->get();
+
+            if ($tasks->isEmpty()) {
+                return Common::sendStdResponse(
+                    'No hay ninguna tarea disponible.',
+                    ['tasks' => $tasks],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente todas las tareas.',
+                ['tasks' => $tasks]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     function getAllDifficulties() {
         try {
             $difficulties = Difficulty::all();
@@ -80,7 +167,13 @@ class TaskController extends Controller
                 );
             }
 
-            if ($task->user()) $task->user()->delete();
+            if ($task->userAssigned()) {
+                $task->userAssigned()->delete();
+            }
+
+            if ($task->assignedBy()) {
+                $task->assignedBy()->delete();
+            }
 
             $deleted = $task->delete();
 
@@ -204,7 +297,8 @@ class TaskController extends Controller
         $validate = Validator::make(
             $request->all(),
             [
-                'userId' => 'integer|max:255',
+                'assignTo' => 'required|integer|max:255',
+                'assignedBy' => 'required|integer|max:255',
             ]
         );
 
@@ -217,7 +311,8 @@ class TaskController extends Controller
         try {
             $task = Task::find($id);
 
-            $task->user_id = $request->userId;
+            $task->assigned_to = $request->assignTo;
+            $task->assigned_by = $request->assignedBy;
 
             $updated = $task->save();
 
@@ -241,7 +336,8 @@ class TaskController extends Controller
         try {
             $task = Task::find($id);
 
-            $task->user_id = null;
+            $task->assigned_to = null;
+            $task->assigned_by = null;
 
             $updated = $task->save();
 
@@ -260,4 +356,110 @@ class TaskController extends Controller
             );
         }
     }
+
+    function getAssignedTasks(int $id) {
+        try {
+            $tasks = Task::with(['difficulty', 'assignedBy'])
+                ->where('assigned_to', $id)
+                ->where('progress', '<', 100)
+                ->get();
+
+            if ($tasks->isEmpty()) {
+                return Common::sendStdResponse(
+                    'El usuario no tiene tareas asignadas.',
+                    ['tasks' => $tasks]
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente todas las tareas asignadas al usuarios.',
+                ['tasks' => $tasks]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function getRealizedTasks(int $id) {
+        try {
+            $tasks = Task::with(['difficulty', 'assignedBy'])
+                ->where('assigned_to', $id)
+                ->where('progress', '=', '100')
+                ->get();
+
+            if ($tasks->isEmpty()) {
+                return Common::sendStdResponse(
+                    'El usuario no tiene tareas asignadas.',
+                    ['tasks' => $tasks]
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente todas las tareas asignadas al usuarios.',
+                ['tasks' => $tasks]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function changeTaskProgress(int $id, Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'progress' => 'required|integer|min:0|max:100',
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            [false],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        try {
+            $task = Task::find($id);
+
+            if (!$task) {
+                return Common::sendStdResponse(
+                    'No hay ninguna tarea disponible.',
+                    ['task' => $task],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            $task->progress = $request->progress;
+
+            $task->save();
+
+            return Common::sendStdResponse(
+                'Se ha editado el progreso de la tarea correctamente.',
+                ['task' => $task]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
 }

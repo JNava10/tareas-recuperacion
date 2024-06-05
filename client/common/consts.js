@@ -33,3 +33,6 @@ export const colors = {
     danger: 'danger',
 }
 
+// CLIENT //
+
+export const hostPath = `http://${window.location.host}/public`;

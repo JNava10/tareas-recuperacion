@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\helpers\Common;
 use App\Models\AssignedRoles;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Mockery\Exception;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
 
@@ -30,6 +33,34 @@ class UserController extends Controller
             return Common::sendStdResponse(
                 'Se han obtenido correctamente todos los usuarios.',
                 ['users' => $users]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function getUser(int $id) {
+        try {
+            $user = User::with('roles')->find($id);
+
+            if (!$user) {
+                return Common::sendStdResponse(
+                    'No existe ningun usuario coincidente.',
+                    [$user],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente el usuario.',
+                [$user]
             );
         } catch (Exception $exception)
         {
@@ -229,10 +260,11 @@ class UserController extends Controller
         $validate = Validator::make(
             $request->all(),
             [
-                'id' => 'required|string|max:255',
+                'id' => 'required|int|max:255',
                 'name' => 'string|max:255',
-                'firstSurname' => 'string|max:255',
-                'secondSurname' => 'string|max:255',
+                'email' => 'email|max:255',
+                'first_lastname' => 'string|max:255',
+                'second_lastname' => 'string|max:255',
             ]
         );
 
@@ -246,8 +278,9 @@ class UserController extends Controller
             $user = User::find($request->id);
 
             if ($request->name) $user->name = $request->name;
-            elseif ($request->firstLastname) $user->first_lastname = $request->firstLastname;
-            elseif ($request->secondLastname) $user->second_lastname = $request->secondSurname;
+            elseif ($request->first_lastname) $user->first_lastname = $request->first_lastname;
+            elseif ($request->second_lastname) $user->second_lastname = $request->second_lastname;
+            elseif ($request->email) $user->email = $request->email;
             else return Common::sendStdResponse(
                 'No se ha indicado ningun campo que actualizar.',
                 ['executed' => false]
@@ -391,11 +424,11 @@ class UserController extends Controller
                 [
                     'name' => 'required|string|max:255',
                     'email' => 'required|string|max:255',
-                    'first_lastname' => 'required|string|max:255',
-                    'second_lastname' => 'required|string|max:255',
+                    'firstLastname' => 'required|string|max:255',
+                    'secondLastname' => 'required|string|max:255',
                     'password' => 'required|string|max:255',
                     'roles' => 'array',
-                    'roles.*' => 'integer|required|max:255'
+                    'roles.*' => 'string|required|max:255'
                 ]
             );
 
@@ -416,27 +449,133 @@ class UserController extends Controller
 
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->first_lastname = $request->first_lastname;
-            $user->second_lastname = $request->second_lastname;
+            $user->first_lastname = $request->firstLastname;
+            $user->second_lastname = $request->secondLastname;
             $user->password = Hash::make($request->password);
 
             $saved = $user->save();
             $userId = User::where('email', $request->email)->first()->id;
 
+            if ($request->roles) {
+                foreach ($request->roles as $roleName) {
+                    $roleId = Role::where('name', $roleName)->first()->id;
 
-            foreach ($request->roles as $roleId) {
-                $assignedRole = new AssignedRoles();
+                    $assignedRole = new AssignedRoles();
 
-                $assignedRole->user_id = $userId;
-                $assignedRole->role_id = $roleId;
-                $assignedRole->created_at = now();
-                $assignedRole->updated_at = now();
-                $assignedRole->save();
+                    $assignedRole->user_id = $userId;
+                    $assignedRole->role_id = $roleId;
+                    $assignedRole->created_at = now();
+                    $assignedRole->updated_at = now();
+                    $assignedRole->save();
+                }
             }
 
             return Common::sendStdResponse(
                 'Se ha guardado el usuario correctamente.',
                 ['executed' => $saved]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function updateUserRoles(int $id, Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'roles' => 'required|array',
+                'roles.*' => 'required|int|max:255'
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            [false],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        try {
+            foreach ($request->roles as $role) {
+                $assignedRole = new AssignedRoles();
+
+                $assignedRole->user_id = $id;
+                $assignedRole->role_id = $role;
+
+                $assignedRole->save();
+            }
+
+            return Common::sendStdResponse(
+                'Se han asignado los roles correctamente.',
+                ['executed' => true]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    public function changeProfilePic(int $userId, Request $request) {
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            ]
+        );
+
+        if ($validate->fails()) return Common::sendStdResponse(
+            "Revisa la estructura de la petición e intentalo de nuevo.",
+            ['fails' => $validate->failed(), 'request' =>  $request->all()],
+            SymphonyResponse::HTTP_BAD_REQUEST
+        );
+
+        $file = $request->file('image');
+        $path = $file->store('profile_pìcs', 's3');
+        $url = Storage::disk('s3')->url($path);
+
+        if (!$url) return Common::sendStdResponse(
+            "Ha ocurrido un error al subir la imagen.",
+            [false],
+            SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+        );
+
+        $user = User::find($userId);
+        $user->pic_url = $url;
+        $user->save();
+
+        return Common::sendStdResponse(
+            'Se ha cambiado la foto de perfil correctamente.',
+            ['url' => $url]
+        );
+    }
+
+    function getUserRoles(int $id) {
+        try {
+            $user = User::with('roles')->find($id);
+
+            if (!$user) {
+                return Common::sendStdResponse(
+                    'No existe el usuario en el sistema.',
+                    ['users' => $user],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente todos los usuarios.',
+                ['roles' => $user->roles]
             );
         } catch (Exception $exception)
         {
