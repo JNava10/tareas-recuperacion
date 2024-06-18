@@ -235,6 +235,22 @@ const createTaskElement = (task) => {
     const taskCardElement = createElementFromString(taskCardHtml);
     const buttonsDiv = taskCardElement.querySelector('.buttons');
 
+    const assignToAffine = createElementFromString(`<button class="button is-success"><i class="fa-solid fa-user"></i></button>`);
+
+    assignToAffine.onclick = async () => {
+        const {message, data} = await taskApi.assignToAffine(task.id)
+
+        if (data.executed) {
+            showAlert(message, colors.success);
+        } else {
+            showAlert(message, colors.danger);
+        }
+
+        await showAllTasks();
+    }
+
+    buttonsDiv.append(assignToAffine);
+
     let assignButtonElement;
 
     if (task.assigned_to) {
@@ -297,8 +313,6 @@ const createTaskElement = (task) => {
                 const {message, data} = await taskApi.assignTask(task.id, user.id);
 
                 closeModal(searchModal);
-
-                console.log(message)
 
                 if (data.executed) showAlert(message);
                 else showAlert(message, colors.danger);

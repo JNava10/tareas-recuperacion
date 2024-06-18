@@ -22,3 +22,7 @@ export const login = async (email, password) => {
     return await Fetch.post('auth/login', body, false);
 }
 
+
+export const logout = async () => {
+    return await Fetch.post('auth/logout', {}, true);
+}

@@ -1,6 +1,8 @@
 import {getLargeBadge} from "../flowbite/badge.js";
 import {createElementFromString} from "../services/common.service.js";
 import * as taskApi from "../api/task.api.js";
+import {showAlert} from "../services/message.service.js";
+import {colors} from "../consts.js";
 
 export const getUnassignedTaskCard = (task) => {
     const cardHtml =
@@ -105,7 +107,12 @@ export const getTaskProgressField  = (task) => {
 
         clearTimeout(timeout);
 
-        timeout = setTimeout(() => taskApi.changeTaskProgress(task.id, progress), 400);
+        timeout = setTimeout(async () => {
+            const {message, data} = await taskApi.changeTaskProgress(task.id, progress);
+
+            if (data.executed) showAlert(message);
+            else showAlert(message, colors.danger);
+        }, 400);
     };
 
     return {html, element}

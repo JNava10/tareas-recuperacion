@@ -106,35 +106,35 @@ class UserController extends Controller
         }
     }
 
-    function getAllAdmins() {
-        try {
-            $users = User::withWhereHas('roles', function ($query) {
-                $query->where('name', '=', 'admin');
-            })->get();
-
-            if ($users->isEmpty()) {
-                return Common::sendStdResponse(
-                    'No se han encontrado usuarios administradores.',
-                    ['users' => $users, 'executed' => true],
-                    SymphonyResponse::HTTP_NOT_FOUND
-                );
-            }
-
-            return Common::sendStdResponse(
-                'Se han obtenido correctamente los usuarios.',
-                ['users' => $users, 'executed' => true]
-            );
-        } catch (Exception $exception)
-        {
-            return Common::sendStdResponse(
-                'Ha ocurrido un error en el servidor.',
-                [
-                    'error' => $exception->getMessage()
-                ],
-                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
-            );
-        }
-    }
+//    function getAllAdmins() {
+//        try {
+//            $users = User::withWhereHas('roles', function ($query) {
+//                $query->where('name', '=', 'admin');
+//            })->get();
+//
+//            if ($users->isEmpty()) {
+//                return Common::sendStdResponse(
+//                    'No se han encontrado usuarios administradores.',
+//                    ['users' => $users, 'executed' => true],
+//                    SymphonyResponse::HTTP_NOT_FOUND
+//                );
+//            }
+//
+//            return Common::sendStdResponse(
+//                'Se han obtenido correctamente los usuarios.',
+//                ['users' => $users, 'executed' => true]
+//            );
+//        } catch (Exception $exception)
+//        {
+//            return Common::sendStdResponse(
+//                'Ha ocurrido un error en el servidor.',
+//                [
+//                    'error' => $exception->getMessage()
+//                ],
+//                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+//            );
+//        }
+//    }
 
     function getUsersByFullname(Request $request) {
         try {
@@ -502,6 +502,12 @@ class UserController extends Controller
         );
 
         try {
+            $userRoles = AssignedRoles::where('user_id', $id)->get();
+
+            foreach ($userRoles as $role) {
+                $role->delete();
+            }
+
             foreach ($request->roles as $role) {
                 $assignedRole = new AssignedRoles();
 
@@ -588,4 +594,6 @@ class UserController extends Controller
             );
         }
     }
+
+
 }
