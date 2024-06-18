@@ -1,10 +1,14 @@
 import {Fetch} from "./fetch.js";
 import {getUserId} from "../services/common.service.js";
 
+export const assignToAffine = async (id) => {
+    const userId = getUserId()
+    return await Fetch.post(`task/affine/${id}/${userId}`, null, true);
+};
+
 export const releaseTask = async (id) => {
     return await Fetch.post(`task/release/${id}`, null, true);
 };
-
 
 export const getAvailableTasks = async () => {
     return await Fetch.get(`task/available`, [], true);
@@ -18,7 +22,6 @@ export const assignTask = async (taskId, userToAssign) => {
     const clientUserId = getUserId();
 
     return await Fetch.post(`task/assign/${taskId}`, {assignTo: userToAssign, assignedBy: clientUserId}, true)
-
 }
 
 export const createTask = async (createdTask) => {

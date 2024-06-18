@@ -465,14 +465,13 @@ class TaskController extends Controller
         }
     }
 
-    function getMostAffineUser(Request $request) {
+    function getMostAffineUser(int $taskId, int $userId) {
         try {
-            $diffName = $request->query('difficulty');
-            $diff = Difficulty::where('name', $diffName)->first()->id;
+            $diff = Task::with('difficulty')->find($taskId)->difficulty->id;
 
             if (!$diff) return Common::sendStdResponse(
                 'La dificultad indicada no existe.',
-                ['roles' => $user->roles]
+                []
             );
 
             // 1. Sacamos el ranking de usuarios que mas tareas de la dificultad necesaria
@@ -524,44 +523,51 @@ class TaskController extends Controller
 
             // El algoritmo será mas duro con los usuarios que no cumplan las condiciones,
             // para que destaque el usuario que realmente sea afín.
-            foreach ($baseIds as $id) {
-                $pointList[$id] = $basePoints;
+            foreach ($baseIds as $taskId) {
+                $pointList[$taskId] = $basePoints;
 
-                if ($topDiffs->first()->user === $id) {
-                    $pointList[$id] += 1;
+                if ($topDiffs->first()->user === $taskId) {
+                    $pointList[$taskId] += 1;
                 } else {
-                    $pointList[$id] -= 2;
+                    $pointList[$taskId] -= 2;
                 }
 
                 // Este es el criterio con más peso, puesto que
                 // se prefiere asignar la tarea a los usuarios
                 // menos ocupados.
-                if ($mostBusyUsers->first()->user === $id) {
-                    $pointList[$id] += 4;
+                if ($mostBusyUsers->first()->user === $taskId) {
+                    $pointList[$taskId] += 4;
                 } else {
-                    $pointList[$id] -= 4;
+                    $pointList[$taskId] -= 4;
                 }
 
-                if ($topUsers->first()->user === $id) {
-                    $pointList[$id] += 6;
+                if ($topUsers->first()->user === $taskId) {
+                    $pointList[$taskId] += 6;
                 } else {
-                    $pointList[$id] -= 4;
+                    $pointList[$taskId] -= 4;
                 }
             }
-
-            rsort($pointList);
 
             if (count($pointList) === 0) {
                 return Common::sendStdResponse(
                     'No se ha encontrado ningún usuario afín.',
-                    [],
+                    ['executed' => false],
                     SymphonyResponse::HTTP_NOT_FOUND
                 );
             }
 
+            $mostAffine = array_key_first($pointList);
+
+            $task = Task::find($taskId);
+
+            $task->assigned_to = $mostAffine;
+            $task->assigned_by = $userId;
+
+            $updated = $task->save();
+
             return Common::sendStdResponse(
-                'Se han obtenido correctamente los usuarios afínes.',
-                ['users' => $pointList]
+                'Se ha asignado la tarea correctamente el usuario más afín.',
+                ['executed' => $updated]
             );
         } catch (Exception $exception)
         {

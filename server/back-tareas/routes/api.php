@@ -53,11 +53,12 @@ Route::prefix('/task')->middleware('auth:sanctum')->group(function () {
     Route::delete('/{id}', [TaskController::class, 'deleteTask'])->middleware(AdminMiddleware::$alias);
     Route::put('/{id}', [TaskController::class, 'editTask'])->middleware(AdminMiddleware::$alias);
     Route::post('/', [TaskController::class, 'createTask'])->middleware(AdminMiddleware::$alias);
-    Route::post('/assign/{id}', [TaskController::class, 'assignTask'])->middleware(DevOrAdminMiddleware::$alias);;
+    Route::post('/assign/{id}', [TaskController::class, 'assignTask'])->middleware(DevOrAdminMiddleware::$alias);
     Route::post('/unassign/{id}', [TaskController::class, 'unassignTask'])->middleware(AdminMiddleware::$alias);
     Route::post('/release/{id}', [TaskController::class, 'unassignTask'])->middleware(DevMiddleware::$alias);
-
-    Route::get('/assigned/{id}', [TaskController::class, 'getAssignedTasks'])->middleware(DevOrAdminMiddleware::$alias);;
+    Route::put('/progress/{id}', [TaskController::class, 'changeTaskProgress'])->middleware(DevOrAdminMiddleware::$alias);
+    Route::get('/assigned/{id}', [TaskController::class, 'getAssignedTasks'])->middleware(DevOrAdminMiddleware::$alias);
     Route::get('/realized/{id}', [TaskController::class, 'getRealizedTasks'])->middleware(AdminMiddleware::$alias);
     Route::get('/available', [TaskController::class, 'getAvailableTasks'])->middleware(DevMiddleware::$alias);
+    Route::post('/affine/{taskId}/{userId}', [TaskController::class, 'getMostAffineUser'])->middleware(AdminMiddleware::$alias);
 });

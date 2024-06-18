@@ -26,7 +26,7 @@ class DevOrAdminMiddleware
         }
         else {
             return Common::sendStdResponse(
-                'No se ha encontrado ningún usuario afín.',
+                'El token no es valido.',
                 [],
                 SymphonyResponse::HTTP_NOT_FOUND
             );
