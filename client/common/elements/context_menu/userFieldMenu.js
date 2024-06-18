@@ -63,7 +63,6 @@ const openRealizedTasks = async (user) => {
 
     const {tasks} = await getRealizedTasks(user.id)
 
-
     const assignedTasksListHtml =
         `<div>
             <form class="max-w-md mx-auto sticky top-3">   

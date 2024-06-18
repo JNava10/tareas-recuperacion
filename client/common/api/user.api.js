@@ -5,29 +5,23 @@ import {getUserId} from "../services/common.service.js";
 
 export const editUserRoles = async (user) => {
     const {id, roles} = user;
-    return await Fetch.put('user/roles', {roles},[id], false);
+    return await Fetch.put('user/roles', {roles},[id], true);
 };
 
 export const getSelfRoles = async () => {
     const userId = getUserId();
 
-    return await Fetch.get('user/roles', [userId], false);
+    return await Fetch.get('user/roles', [userId], true);
 };
 
 export const getAllUsers = async () => {
-    return await Fetch.get('user', [], false);
+    return await Fetch.get('user', [], true);
 };
 
 export const getSelfData = async () => {
     const userId = getUserId();
-    return await Fetch.get('user/', [userId], false);
+    return await Fetch.get('user/', [userId], true);
 };
-
-export const signOut = async () => {
-    const userId = getUserId();
-    return await Fetch.post('auth/sign-out', [userId], false);
-};
-
 
 /**
  *
@@ -35,7 +29,7 @@ export const signOut = async () => {
  * @returns {Promise<boolean|null|*>}
  */
 export const editUser = async (editedUser) => {
-    return await Fetch.put('user/data', editedUser, [],  false);
+    return await Fetch.put('user/data', editedUser, [],  true);
 };
 
 /**
@@ -44,23 +38,23 @@ export const editUser = async (editedUser) => {
  * @returns {Promise<boolean|*|undefined>}
  */
 export const editUserPassword = async (passwordEdited) => {
-    return await Fetch.put('user/password', passwordEdited, [],  false);
+    return await Fetch.put('user/password', passwordEdited, [],  true);
 };
 
 export const deleteUser = async (userId) => {
-    return await Fetch.delete('user/', null, [userId],  false);
+    return await Fetch.delete('user/', null, [userId],  true);
 };
 
 export const restoreUser = async (userId) => {
-    return await Fetch.post('user/restore', {id: userId},  false);
+    return await Fetch.post('user/restore', {id: userId},  true);
 };
 
 export const createUser = async (user) => {
-    return await Fetch.post('user', user,  false);
+    return await Fetch.post('user', user,  true);
 };
 
 export const searchUsers = async (searchInput) => {
-    return await Fetch.get('user', [searchInput],  false);
+    return await Fetch.get('user', [searchInput],  true);
 };
 
 export const changeProfilePic = async (file) => {
@@ -71,9 +65,9 @@ export const changeProfilePic = async (file) => {
 
     console.log(formData.get('image'))
 
-    return await Fetch.postFormData(`user/profile_pic/${userId}`, formData, false);
+    return await Fetch.postFormData(`user/profile_pic/${userId}`, formData, true);
 };
 
 export const registerUser = async (user) => {
-    return await Fetch.post('user/register', user,  false);
+    return await Fetch.post('user/register', user,  true);
 };

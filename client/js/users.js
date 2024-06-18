@@ -55,8 +55,6 @@ onload = async () => {
     const roleData = await roleApi.getAllRoles();
 
     roles = roleData.roles;
-
-    console.log(roles)
 }
 
 const openUserSummary = () => {
@@ -130,6 +128,8 @@ const addRow = (user) => {
 };
 
 const openEditModal = (user) => {
+    editUserRoleList.innerHTML = '';
+
     userEditing = user.id;
     userEditingRoles = new Set();
 
@@ -144,8 +144,6 @@ const openEditModal = (user) => {
 
     roles.forEach(role => {
         const roleItem = createElementFromString(`<button class="button is-dark is-primary cell ">${capitalize(role.name)}</input>`);
-
-        console.log(role.name)
 
         roleItem.onclick = () => {
             const active = roleItem.classList.contains('is-active');
@@ -260,7 +258,7 @@ submitEditRolesBtn.onclick = async () => {
     if (data.executed === true) {
         showAlert(message, colors.success);
         setTimeout(() => location.reload(), 800); // Añadimos un tiempo de espera para que sea posible leer el mensaje.
-        
+
     }
     else showAlert(message, colors.danger);
 }
@@ -302,6 +300,7 @@ const openRestoreModal = (user) => {
 };
 
 createUserBtn.onclick = async () => {
+    createUserRoleList.innerHTML = "";
     openModalById(createUserModalId);
 
     roles.forEach(role => {
@@ -352,20 +351,29 @@ submitCreateBtn.onclick = async () => {
     const fieldsInvalid = new Map();
 
     // Recorremos todos los campos del formulario, para poder obtener su valor y validarlos.
+
     fields.forEach(field => {
         const fieldName = field.getAttribute('field');
-        const value = field.value;
-        const isValid = regex[fieldName].test(value);
 
-        if (isValid) {
-            fieldsValid.set(fieldName, {field: field, isValid: isValid});
-            changeInputColor(field, colors.success);
-        } else {
-            fieldsInvalid.set(fieldName, {field: field, isValid: isValid});
-            changeInputColor(field, colors.danger);
+        if (fieldName) {
+            const value = field.value;
+            console.log(fieldName)
+            let fieldRegex = regex[fieldName];
+
+            if (fieldRegex) {
+                const isValid = fieldRegex.test(value);
+
+                if (isValid) {
+                    fieldsValid.set(fieldName, {field: field, isValid: isValid});
+                    changeInputColor(field, colors.success);
+                } else {
+                    fieldsInvalid.set(fieldName, {field: field, isValid: isValid});
+                    changeInputColor(field, colors.danger);
+                }
+
+                if (!field.getAttribute('ignore')) userCreating[fieldName] = value;
+            }
         }
-
-        if (!field.getAttribute('ignore')) userCreating[fieldName] = value;
     });
 
     if (fieldsInvalid.size > 0) {

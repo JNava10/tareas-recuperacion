@@ -9,6 +9,7 @@ export class Fetch {
             "method": CONSTANTS.REST_METHODS.POST,
             "headers": {
                 "Content-Type": "application/json",
+                "Accept": "application/json",
             },
 
             "body": JSON.stringify(jsonBody)
@@ -72,7 +73,9 @@ export class Fetch {
 
         const options = {
             "method": CONSTANTS.REST_METHODS.GET,
-            headers: {}
+            headers: {
+                "Accept": "application/json"
+            }
         };
 
         if (sendToken === true) {
@@ -120,7 +123,9 @@ export class Fetch {
 
         const options = {
             method: CONSTANTS.REST_METHODS.PUT,
-            headers: {}
+            headers: {
+                "Accept": "application/json"
+            }
         };
 
         if (body) {

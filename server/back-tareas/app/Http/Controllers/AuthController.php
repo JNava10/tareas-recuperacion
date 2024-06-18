@@ -65,8 +65,20 @@ class AuthController extends Controller
         );
     }
 
+    function logout(Request $request) {
+        $user = $request->user();
+        $user->tokens()->delete();
+
+        return Common::sendStdResponse(
+            "Se ha cerrado sesión correctamente.",
+            [
+                "executed" => true
+            ]
+        );
+    }
+
     /*
-     * Explicación sobre el algoritmo de recuperación de contraseña:
+     * Explicación sobre el sistema de recuperación de contraseña:
      *
      * Se ha implementado un sistema seguro en donde el usuario puede cambiar su contraseña a traves de codigos de un unico uso.
      * Es decir, cada vez que el usuario quiere recuperar su contraseña, debe introducir un codigo unico para poder cambiar su contraseña.

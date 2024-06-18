@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\auth\AdminMiddleware;
+use App\Http\Middleware\auth\DevMiddleware;
+use App\Http\Middleware\auth\DevOrAdminMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'admin' => AdminMiddleware::class,
+            'dev' => DevMiddleware::class,
+            'devOrAdmin' => DevOrAdminMiddleware::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

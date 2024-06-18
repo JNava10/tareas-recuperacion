@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\helpers\Common;
 use App\Models\Difficulty;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Mockery\Exception;
+use SebastianBergmann\Diff\Diff;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
 
 class TaskController extends Controller
@@ -449,6 +452,122 @@ class TaskController extends Controller
             return Common::sendStdResponse(
                 'Se ha editado el progreso de la tarea correctamente.',
                 ['task' => $task]
+            );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function getMostAffineUser(int $taskId, int $userId) {
+        try {
+            $diff = Task::with('difficulty')->find($taskId)->difficulty->id;
+
+            if (!$diff) return Common::sendStdResponse(
+                'La dificultad indicada no existe.',
+                []
+            );
+
+            // 1. Sacamos el ranking de usuarios que mas tareas de la dificultad necesaria
+            // hayan realizado, con un limite de 15.
+            $baseUsers = DB::table('tasks')
+                ->join('difficulties', 'tasks.diff_id', '=', 'difficulties.id')
+                ->selectRaw('assigned_to AS user, COUNT(tasks.id) AS realizedCount')
+                ->where('tasks.progress', '=', 100)
+                ->where('difficulties.id', '=', $diff)
+                ->groupBy('user')
+                ->orderBy('realizedCount', 'desc')
+                ->limit(20)
+                ->get();
+
+            $baseIds = $baseUsers->pluck('user');
+
+            // 2. Sacamos el top de dificultad de cada usuario base, según cuantas ha realizado.
+            $topDiffs = DB::table('tasks')
+                ->join('difficulties', 'tasks.diff_id', '=', 'difficulties.id')
+                ->selectRaw('assigned_to AS user, tasks.diff_id AS difficulty, COUNT(tasks.id) AS realizedCount')
+                ->where('tasks.progress', '=', 100)
+                ->whereIn('tasks.assigned_to', $baseIds)
+                ->groupBy('user', 'difficulty')
+                ->orderBy('realizedCount', 'desc')
+                ->get();
+
+            // 3. Sacamos quien es el usuario que mas tareas tiene. Cuantas menos tareas, mayor puntuación.
+            $mostBusyUsers = DB::table('tasks')
+                ->selectRaw('assigned_to AS user, COUNT(tasks.id) AS realizedCount')
+                ->whereNotNull('tasks.assigned_to')
+                ->whereIn('tasks.assigned_to', $baseIds)
+                ->orderBy('realizedCount', 'desc')
+                ->groupBy('user')
+                ->get();
+
+            // 4. Sacamos los 15 usuarios mas trabajadores (los 15 que mas tareas han realizado). Si alguno de los usuarios base
+            // se encuentra aquí, su puntuación subirá bastante-
+            $topUsers = DB::table('tasks')
+                ->selectRaw('assigned_to AS user, COUNT(id) AS realizedTasks')
+                ->whereNotNull('tasks.assigned_to')
+                ->orderBy('realizedTasks', 'desc')
+                ->groupBy('user')
+                ->get();
+
+            $pointList = []; // Array clave-valor con clave: ID de usuario, valor: Puntuacion.
+            $basePoints = 0;
+
+            // 5. Realizamos las comprobaciones con los usuarios base.
+
+            // El algoritmo será mas duro con los usuarios que no cumplan las condiciones,
+            // para que destaque el usuario que realmente sea afín.
+            foreach ($baseIds as $taskId) {
+                $pointList[$taskId] = $basePoints;
+
+                if ($topDiffs->first()->user === $taskId) {
+                    $pointList[$taskId] += 1;
+                } else {
+                    $pointList[$taskId] -= 2;
+                }
+
+                // Este es el criterio con más peso, puesto que
+                // se prefiere asignar la tarea a los usuarios
+                // menos ocupados.
+                if ($mostBusyUsers->first()->user === $taskId) {
+                    $pointList[$taskId] += 4;
+                } else {
+                    $pointList[$taskId] -= 4;
+                }
+
+                if ($topUsers->first()->user === $taskId) {
+                    $pointList[$taskId] += 6;
+                } else {
+                    $pointList[$taskId] -= 4;
+                }
+            }
+
+            if (count($pointList) === 0) {
+                return Common::sendStdResponse(
+                    'No se ha encontrado ningún usuario afín.',
+                    ['executed' => false],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+            $mostAffine = array_key_first($pointList);
+
+            $task = Task::find($taskId);
+
+            $task->assigned_to = $mostAffine;
+            $task->assigned_by = $userId;
+
+            $updated = $task->save();
+
+            return Common::sendStdResponse(
+                'Se ha asignado la tarea correctamente el usuario más afín.',
+                ['executed' => $updated]
             );
         } catch (Exception $exception)
         {

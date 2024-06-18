@@ -51,25 +51,3 @@ const buildAssignedTasksPanel = (tasks) => {
         panel.append(taskCard);
     })
 };
-
-const calculateProgressColor = (progress) => {
-    if (progress > 0 && progress <= 25) return colors.danger;
-    else if (progress > 25 && progress <= 50) return colors.warning;
-    else if (progress > 50 && progress <= 75) return colors.info;
-    else if (progress === 100) return colors.success;
-    else if (progress > 75 && progress <= 100) return colors.primary;
-};
-
-const changeProgressValue = (event) => {
-    const width = event.target.offsetWidth - event.target.style.borderWidth;
-    const rect =  event.target.getBoundingClientRect();
-    const x = Math.round(event.pageX - rect.left);
-
-    const progress = Math.round(x / width * 100);
-
-    // if (progress === event.target.value) return;
-
-    event.target.value = progress;
-
-    console.log(progress)
-}

@@ -10,6 +10,8 @@ let tasks = [];
 let showingTasks = [];
 
 onload = async () => {
+    console.log('A')
+
     console.log(document.querySelector('.profileImg'))
     await buildNavbar();
     const data = await getAllTasksWithAssignedTo();
