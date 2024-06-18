@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Mockery\Exception;
+use SebastianBergmann\Diff\Diff;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
 
 class TaskController extends Controller
@@ -464,14 +465,18 @@ class TaskController extends Controller
         }
     }
 
-    function getMostAffineUser(int $taskId) {
+    function getMostAffineUser(Request $request) {
         try {
-            $task = Task::with('difficulty')->find($taskId);
-            $diff = $task->difficulty->id;
-            $hours = $task->scheduled_hours;
+            $diffName = $request->query('difficulty');
+            $diff = Difficulty::where('name', $diffName)->first()->id;
 
+            if (!$diff) return Common::sendStdResponse(
+                'La dificultad indicada no existe.',
+                ['roles' => $user->roles]
+            );
 
-            // 1. Sacamos el ranking de usuarios que mas tareas hayan realizado, con un limite de 15.
+            // 1. Sacamos el ranking de usuarios que mas tareas de la dificultad necesaria
+            // hayan realizado, con un limite de 15.
             $baseUsers = DB::table('tasks')
                 ->join('difficulties', 'tasks.diff_id', '=', 'difficulties.id')
                 ->selectRaw('assigned_to AS user, COUNT(tasks.id) AS realizedCount')
@@ -484,7 +489,7 @@ class TaskController extends Controller
 
             $baseIds = $baseUsers->pluck('user');
 
-            // Sacamos el top de dificultad de cada usuario base, según cuantas ha realizado.
+            // 2. Sacamos el top de dificultad de cada usuario base, según cuantas ha realizado.
             $topDiffs = DB::table('tasks')
                 ->join('difficulties', 'tasks.diff_id', '=', 'difficulties.id')
                 ->selectRaw('assigned_to AS user, tasks.diff_id AS difficulty, COUNT(tasks.id) AS realizedCount')
@@ -494,7 +499,7 @@ class TaskController extends Controller
                 ->orderBy('realizedCount', 'desc')
                 ->get();
 
-            // Sacamos quien es el usuario que mas tareas tiene
+            // 3. Sacamos quien es el usuario que mas tareas tiene. Cuantas menos tareas, mayor puntuación.
             $mostBusyUsers = DB::table('tasks')
                 ->selectRaw('assigned_to AS user, COUNT(tasks.id) AS realizedCount')
                 ->whereNotNull('tasks.assigned_to')
@@ -503,37 +508,61 @@ class TaskController extends Controller
                 ->groupBy('user')
                 ->get();
 
-            // Sacamos la media de tiempo que tardan los usuarios en realizar tareas.
-            $averageRealizeTime = DB::table('tasks')
-                ->selectRaw('assigned_to AS user, AVG(tasks.realized_hours) AS averageTime')
+            // 4. Sacamos los 15 usuarios mas trabajadores (los 15 que mas tareas han realizado). Si alguno de los usuarios base
+            // se encuentra aquí, su puntuación subirá bastante-
+            $topUsers = DB::table('tasks')
+                ->selectRaw('assigned_to AS user, COUNT(id) AS realizedTasks')
                 ->whereNotNull('tasks.assigned_to')
-                ->whereIn('tasks.assigned_to', $baseIds)
-                ->orderBy('averageTime', 'desc')
+                ->orderBy('realizedTasks', 'desc')
                 ->groupBy('user')
                 ->get();
 
-            echo json_encode($averageRealizeTime);
-
             $pointList = []; // Array clave-valor con clave: ID de usuario, valor: Puntuacion.
-            $basePoints = $baseIds->count() - (floor($baseUsers->count() * 0.20)); // Le restamos un porcentaje para balancear, y que los primeros no tengan tanta ventaja.
+            $basePoints = 0;
 
+            // 5. Realizamos las comprobaciones con los usuarios base.
+
+            // El algoritmo será mas duro con los usuarios que no cumplan las condiciones,
+            // para que destaque el usuario que realmente sea afín.
             foreach ($baseIds as $id) {
                 $pointList[$id] = $basePoints;
+
+                if ($topDiffs->first()->user === $id) {
+                    $pointList[$id] += 1;
+                } else {
+                    $pointList[$id] -= 2;
+                }
+
+                // Este es el criterio con más peso, puesto que
+                // se prefiere asignar la tarea a los usuarios
+                // menos ocupados.
+                if ($mostBusyUsers->first()->user === $id) {
+                    $pointList[$id] += 4;
+                } else {
+                    $pointList[$id] -= 4;
+                }
+
+                if ($topUsers->first()->user === $id) {
+                    $pointList[$id] += 6;
+                } else {
+                    $pointList[$id] -= 4;
+                }
             }
 
+            rsort($pointList);
 
-            if (!$task) {
+            if (count($pointList) === 0) {
                 return Common::sendStdResponse(
-                    'No existe la tarea en el sistema.',
+                    'No se ha encontrado ningún usuario afín.',
                     [],
                     SymphonyResponse::HTTP_NOT_FOUND
                 );
             }
 
-//            return Common::sendStdResponse(
-//                'Se han obtenido correctamente todos los usuarios.',
-//                ['roles' => $user->roles]
-//            );
+            return Common::sendStdResponse(
+                'Se han obtenido correctamente los usuarios afínes.',
+                ['users' => $pointList]
+            );
         } catch (Exception $exception)
         {
             return Common::sendStdResponse(
