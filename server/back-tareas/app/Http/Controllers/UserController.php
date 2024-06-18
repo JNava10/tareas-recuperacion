@@ -502,21 +502,19 @@ class UserController extends Controller
         );
 
         try {
-            $userRoles = AssignedRoles::where('user_id', $id)->pluck('role_id');
+            $userRoles = AssignedRoles::where('user_id', $id)->get();
+
+            foreach ($userRoles as $role) {
+                $role->delete();
+            }
 
             foreach ($request->roles as $role) {
-                if (!$userRoles->has($role)) {
-                    $assignedRole = new AssignedRoles();
+                $assignedRole = new AssignedRoles();
 
-                    $assignedRole->user_id = $id;
-                    $assignedRole->role_id = $role;
+                $assignedRole->user_id = $id;
+                $assignedRole->role_id = $role;
 
-                    $assignedRole->save();
-                } else {
-                    $assignedRole = AssignedRoles::where('user', $id)->where('role', $role)->first();
-
-                    $assignedRole->delete();
-                }
+                $assignedRole->save();
             }
 
             return Common::sendStdResponse(

@@ -1,6 +1,7 @@
-import {createElementFromString, getUserId} from "./common.service.js";
+import {createElementFromString, redirectTo} from "./common.service.js";
 import {hostPath} from "../consts.js";
-import {getSelfData, signOut} from "../api/user.api.js";
+import {logout} from "../api/auth.api.js";
+import {getSelfData} from "../api/user.api.js";
 
 export const buildNavbar = async () => {
     const navbarItemList = document.querySelector('.navbarItems');
@@ -63,7 +64,6 @@ const getNavbarItem = (name, publicPath) => {
 const adminNavItems = [
     {name: 'Gestionar usuarios', publicPath: 'admin/users'},
     {name: 'Gestionar tareas', publicPath: 'admin/tasks'},
-    {name: 'Ranking', publicPath: 'admin/ranking'},
 ];
 
 const devNavItems = [
@@ -73,6 +73,10 @@ const devNavItems = [
 ]
 
 const profileDropdownItems = [
-    {icon: '', name: 'Cerrar sesión', onClick: async () => await signOut()},
-    {icon: '', name: 'Editar perfil', publicPath: 'edit-profile'},
+    {name: 'Cerrar sesión', onClick: async () => {
+            await logout();
+            localStorage.clear();
+            redirectTo('login')
+        }},
+    {name: 'Editar perfil', publicPath: 'edit-profile'},
 ]

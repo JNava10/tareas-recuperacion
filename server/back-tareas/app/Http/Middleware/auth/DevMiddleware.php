@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
 
 class DevMiddleware
 {
-
-    static $ability = "dev";
-
+    static $alias = "dev";
     /**
      * Handle an incoming request.
      *
@@ -20,9 +18,9 @@ class DevMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user(DevMiddleware::$ability);
+        $user = $request->user();
 
-        if ($user->tokenCan()) {
+        if ($user->tokenCan('desarrollador')) {
             return $next($request);
         }
         else {

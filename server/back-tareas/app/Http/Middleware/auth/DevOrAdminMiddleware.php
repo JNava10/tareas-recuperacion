@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
 
-class AdminMiddleware
+class DevOrAdminMiddleware
 {
-    static $alias = "admin";
+    static $alias = "devOrAdmin";
 
     /**
      * Handle an incoming request.
@@ -21,15 +21,15 @@ class AdminMiddleware
     {
         $user = $request->user();
 
-         if ($user->tokenCan('admin')) {
-             return $next($request);
-         }
-         else {
-             return Common::sendStdResponse(
-                 'El token no es valido.',
-                 [],
-                 SymphonyResponse::HTTP_FORBIDDEN
-             );
-         }
+        if ($user->tokenCan('desarrollador') || $user->tokenCan('admin')) {
+            return $next($request);
+        }
+        else {
+            return Common::sendStdResponse(
+                'No se ha encontrado ningún usuario afín.',
+                [],
+                SymphonyResponse::HTTP_NOT_FOUND
+            );
+        }
     }
 }

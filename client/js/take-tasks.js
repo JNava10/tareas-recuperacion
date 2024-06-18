@@ -17,7 +17,7 @@ onload = async () => {
 async function getAvailableTasks() {
     const panel = document.querySelector('#taskList');
     panel.innerHTML = ""
-    
+
     const data = await taskApi.getAvailableTasks();
     tasks = [];
 
