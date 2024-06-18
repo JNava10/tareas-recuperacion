@@ -8,13 +8,16 @@ use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
 {
+    static $userCount = 10;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
         User::factory()
-            ->count(3)->create();
+            ->count(UserSeeder::$userCount)
+            ->create();
 
         User::factory()->create(['email' =>  config('constants.default_email')]);
     }

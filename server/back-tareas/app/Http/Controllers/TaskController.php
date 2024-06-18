@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\helpers\Common;
 use App\Models\Difficulty;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Mockery\Exception;
 use Symfony\Component\HttpFoundation\Response as SymphonyResponse;
@@ -450,6 +452,88 @@ class TaskController extends Controller
                 'Se ha editado el progreso de la tarea correctamente.',
                 ['task' => $task]
             );
+        } catch (Exception $exception)
+        {
+            return Common::sendStdResponse(
+                'Ha ocurrido un error en el servidor.',
+                [
+                    'error' => $exception->getMessage()
+                ],
+                SymphonyResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    function getMostAffineUser(int $taskId) {
+        try {
+            $task = Task::with('difficulty')->find($taskId);
+            $diff = $task->difficulty->id;
+            $hours = $task->scheduled_hours;
+
+
+            // 1. Sacamos el ranking de usuarios que mas tareas hayan realizado, con un limite de 15.
+            $baseUsers = DB::table('tasks')
+                ->join('difficulties', 'tasks.diff_id', '=', 'difficulties.id')
+                ->selectRaw('assigned_to AS user, COUNT(tasks.id) AS realizedCount')
+                ->where('tasks.progress', '=', 100)
+                ->where('difficulties.id', '=', $diff)
+                ->groupBy('user')
+                ->orderBy('realizedCount', 'desc')
+                ->limit(20)
+                ->get();
+
+            $baseIds = $baseUsers->pluck('user');
+
+            // Sacamos el top de dificultad de cada usuario base, según cuantas ha realizado.
+            $topDiffs = DB::table('tasks')
+                ->join('difficulties', 'tasks.diff_id', '=', 'difficulties.id')
+                ->selectRaw('assigned_to AS user, tasks.diff_id AS difficulty, COUNT(tasks.id) AS realizedCount')
+                ->where('tasks.progress', '=', 100)
+                ->whereIn('tasks.assigned_to', $baseIds)
+                ->groupBy('user', 'difficulty')
+                ->orderBy('realizedCount', 'desc')
+                ->get();
+
+            // Sacamos quien es el usuario que mas tareas tiene
+            $mostBusyUsers = DB::table('tasks')
+                ->selectRaw('assigned_to AS user, COUNT(tasks.id) AS realizedCount')
+                ->whereNotNull('tasks.assigned_to')
+                ->whereIn('tasks.assigned_to', $baseIds)
+                ->orderBy('realizedCount', 'desc')
+                ->groupBy('user')
+                ->get();
+
+            // Sacamos la media de tiempo que tardan los usuarios en realizar tareas.
+            $averageRealizeTime = DB::table('tasks')
+                ->selectRaw('assigned_to AS user, AVG(tasks.realized_hours) AS averageTime')
+                ->whereNotNull('tasks.assigned_to')
+                ->whereIn('tasks.assigned_to', $baseIds)
+                ->orderBy('averageTime', 'desc')
+                ->groupBy('user')
+                ->get();
+
+            echo json_encode($averageRealizeTime);
+
+            $pointList = []; // Array clave-valor con clave: ID de usuario, valor: Puntuacion.
+            $basePoints = $baseIds->count() - (floor($baseUsers->count() * 0.20)); // Le restamos un porcentaje para balancear, y que los primeros no tengan tanta ventaja.
+
+            foreach ($baseIds as $id) {
+                $pointList[$id] = $basePoints;
+            }
+
+
+            if (!$task) {
+                return Common::sendStdResponse(
+                    'No existe la tarea en el sistema.',
+                    [],
+                    SymphonyResponse::HTTP_NOT_FOUND
+                );
+            }
+
+//            return Common::sendStdResponse(
+//                'Se han obtenido correctamente todos los usuarios.',
+//                ['roles' => $user->roles]
+//            );
         } catch (Exception $exception)
         {
             return Common::sendStdResponse(
