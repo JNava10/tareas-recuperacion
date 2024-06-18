@@ -130,6 +130,8 @@ const addRow = (user) => {
 };
 
 const openEditModal = (user) => {
+    editUserRoleList.innerHTML = '';
+
     userEditing = user.id;
     userEditingRoles = new Set();
 
@@ -144,8 +146,6 @@ const openEditModal = (user) => {
 
     roles.forEach(role => {
         const roleItem = createElementFromString(`<button class="button is-dark is-primary cell ">${capitalize(role.name)}</input>`);
-
-        console.log(role.name)
 
         roleItem.onclick = () => {
             const active = roleItem.classList.contains('is-active');

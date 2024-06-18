@@ -19,6 +19,8 @@ class UserSeeder extends Seeder
             ->count(UserSeeder::$userCount)
             ->create();
 
-        User::factory()->create(['email' =>  config('constants.default_email')]);
+        User::factory()->create(
+            ['email' =>  config('constants.default_email')]
+        );
     }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\auth\AdminMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,11 +36,8 @@ Route::prefix('/user')->group(function () {
 
     Route::put('/roles/{id}', [UserController::class, 'updateUserRoles']);
     Route::get('/roles/{id}', [UserController::class, 'getUserRoles']);
-    Route::post('/profile_pic/{userId}', [\App\Http\Controllers\UserController::class, 'changeProfilePic']);
-    Route::get('/roles/{id}', [UserController::class, 'getUserRoles']);
-    Route::post('/profile_pic/{userId}', [\App\Http\Controllers\UserController::class, 'changeProfilePic']);
+    Route::post('/profile_pic/{userId}', [UserController::class, 'changeProfilePic']);
     Route::post('/register', [UserController::class, 'createUser']);
-
 });
 
 Route::prefix('/role')->group(function () {
@@ -54,7 +52,6 @@ Route::prefix('/task')->group(function () {
     Route::delete('/{id}', [TaskController::class, 'deleteTask']);
     Route::put('/{id}', [TaskController::class, 'editTask']);
     Route::post('/', [TaskController::class, 'createTask']);
-    Route::post('/', [TaskController::class, 'createTask']);
     Route::post('/assign/{id}', [TaskController::class, 'assignTask']);
     Route::post('/unassign/{id}', [TaskController::class, 'unassignTask']);
     Route::post('/release/{id}', [TaskController::class, 'unassignTask']);
@@ -62,5 +59,4 @@ Route::prefix('/task')->group(function () {
     Route::get('/assigned/{id}', [TaskController::class, 'getAssignedTasks']);
     Route::get('/realized/{id}', [TaskController::class, 'getRealizedTasks']);
     Route::get('/available', [TaskController::class, 'getAvailableTasks']);
-    Route::get('/affine', [TaskController::class, 'getMostAffineUser']);
 });

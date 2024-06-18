@@ -9,8 +9,6 @@ export const buildNavbar = async () => {
 
     const {roles, pic_url} = (await getSelfData())[0];
 
-    console.log(roles)
-
     document.querySelector('.profileImg').src = pic_url
 
     if (roles.find(role => role.name === 'admin')) {
